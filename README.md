@@ -9,11 +9,11 @@ This repository contains the source code and contributions made by Team Rangers.
 To contribute to this project, follow these steps:
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-repo-url.git
+   git clone https://github.com/rangers.git
    ```
 2. Navigate to the project directory:
    ```sh
-   cd your-repo-name
+   cd rangers
    ```
 3. Install dependencies (if applicable):
    ```sh
