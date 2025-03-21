@@ -30,7 +30,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details on how to contribute to thi
 ## Team Members
 
 <!-- - Member 1
-- Member 2
+- Michael Muliro
 - Member 3
 - Member 4 -->
 
