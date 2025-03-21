@@ -32,6 +32,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details on how to contribute to thi
 <!-- - Member 1
 - Member 2
 - Member 3
+Oladipo Olayinka
 - Member 4 -->
 
 Happy coding! 🚀
