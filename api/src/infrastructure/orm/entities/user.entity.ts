@@ -10,22 +10,22 @@ export enum Gender {
 @Table({ tableName: 'users' })
 export class UserEntity extends Model {
   @Column({
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUIDV4,
     primaryKey: true,
     autoIncrement: true,
   })
-  id: number;
+  id: string;
 
   @Column({
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
     field: 'first_name',
   })
   firstName: string;
 
   @Column({
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
     field: 'last_name',
   })
   lastName: string;
@@ -41,6 +41,14 @@ export class UserEntity extends Model {
     type: DataTypes.STRING,
     allowNull: true,
     unique: true,
+    field: 'user_name',
+  })
+  username: string;
+
+  @Column({
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
     field: 'email',
   })
   email: string;
@@ -48,7 +56,7 @@ export class UserEntity extends Model {
   @Column({
     type: DataTypes.STRING,
     unique: true,
-    allowNull: false,
+    allowNull: true,
     field: 'phone',
   })
   phone: string;
@@ -69,14 +77,14 @@ export class UserEntity extends Model {
   @Column({
     type: DataTypes.DATE,
     allowNull: true,
-    field: 'dateOfBirth',
+    field: 'dob',
   })
   dateOfBirth: Date;
 
   @Column({
     type: DataTypes.STRING,
     allowNull: true,
-    field: 'profile_picture',
+    field: 'image',
   })
   image: string;
 }

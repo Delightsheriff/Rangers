@@ -5,10 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { SequelizeConfig } from './infrastructure/orm/sequelize.config';
 
 @Module({
-  imports: [
-    SequelizeModule.forRoot(SequelizeConfig),
-    HealthModule,
-  ],
+  imports: [SequelizeModule.forRoot(SequelizeConfig), HealthModule],
   controllers: [],
   providers: [],
 })
@@ -17,5 +14,3 @@ export class AppModule implements NestModule {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }
 }
-
-
