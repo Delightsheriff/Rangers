@@ -1,32 +1,25 @@
 "use client";
-
-import type React from "react";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent, CardFooter } from "../ui/card";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import Link from "next/link";
+import { Button } from "../ui/button";
 
-export default function SignUpForm() {
+export default function SignInForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!name || !email || !password) {
+    if (!email || !password) {
       setError("Please fill in all fields");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
       return;
     }
 
@@ -35,27 +28,21 @@ export default function SignUpForm() {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      router.push("/auth/login");
+      // Simulating successful login
+      if (email === "demo@example.com" && password === "password") {
+        router.push("/dashboard");
+      } else {
+        setError("Invalid email or password");
+      }
     }, 1500);
   };
 
   return (
     <div className="w-full">
       <Card>
-        <form onSubmit={handleSignup}>
+        <form onSubmit={handleLogin}>
           <CardContent className="pt-4">
             <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -68,19 +55,25 @@ export default function SignUpForm() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-primary underline-offset-4 hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder="********"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <p className="text-xs text-muted-foreground">
-                  Password must be at least 8 characters long
-                </p>
               </div>
+
               {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
           </CardContent>
@@ -108,7 +101,7 @@ export default function SignUpForm() {
                   ></path>
                 </svg>
               ) : (
-                "Sign Up"
+                "Sign In"
               )}
             </Button>
           </CardFooter>
