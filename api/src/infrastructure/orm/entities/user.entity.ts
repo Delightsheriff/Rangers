@@ -8,7 +8,7 @@ export enum Gender {
 }
 
 @Table({ tableName: 'users' })
-export class UserEntity extends Model {
+export class User extends Model {
   @Column({
     type: DataTypes.UUIDV4,
     primaryKey: true,
