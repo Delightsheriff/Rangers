@@ -1,6 +1,6 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from '../../infrastructure/orm/entities/user.entity'; 
+import { UserEntity } from '../../infrastructure/orm/entities/user.entity'; 
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { SignUpDto, LoginDto } from './auth.dto';
@@ -8,16 +8,22 @@ import { SignUpDto, LoginDto } from './auth.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User)
-    private userModel: typeof User,
+    @InjectModel(UserEntity)
+    private userModel: typeof UserEntity,
   ) {}
 
-  async signup(signUpDto: SignUpDto) {
-    const hashedPassword = await bcrypt.hash(signUpDto.password, 10);
+  async signup(SignUpDto: any) {
+    const { first_name, last_name, email, password } = SignUpDto;
+    if (!first_name || !last_name) {
+        throw new BadRequestException('First name and last name are required');
+      }
+    const hashedPassword = await bcrypt.hash(password, 10);
     
     const user = await this.userModel.create({
-      ...signUpDto,
-      password: hashedPassword,
+      firstName: first_name,
+      lastName: last_name,
+      email,
+      password: hashedPassword
     });
 
     const token = this.generateToken(Number(user.id));

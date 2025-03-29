@@ -8,13 +8,13 @@ export enum Gender {
 }
 
 @Table({ tableName: 'users' })
-export class User extends Model {
+export class UserEntity extends Model {
   @Column({
     type: DataTypes.UUIDV4,
     primaryKey: true,
     autoIncrement: true,
   })
-  id: string;
+  id: number;
 
   @Column({
     type: DataTypes.STRING,
