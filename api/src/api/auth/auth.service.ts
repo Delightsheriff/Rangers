@@ -3,7 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { UserEntity } from '../../infrastructure/orm/entities/user.entity'; 
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { SignUpDto, LoginDto } from './auth.dto';
+import { SignUpDto } from './signup.dto'
+import { LoginDto } from './login.dto';
 
 @Injectable()
 export class AuthService {
