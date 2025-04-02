@@ -13,7 +13,7 @@ export enum Gender {
  })
 export class UserEntity extends Model {
   @Column({
-    type: DataType.INTEGER,
+    type: DataTypes.NUMBER,
     primaryKey: true,
     autoIncrement: true,
   })
