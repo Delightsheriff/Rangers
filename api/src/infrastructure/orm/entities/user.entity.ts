@@ -7,10 +7,7 @@ export enum Gender {
   OTHERS = 'others',
 }
 
-@Table({ tableName: 'users',
-         timestamps: true,
-         underscored: true
- })
+@Table({ tableName: 'users', timestamps: true, underscored: true })
 export class UserEntity extends Model {
   @Column({
     type: DataTypes.UUIDV4,
