@@ -13,11 +13,11 @@ export enum Gender {
  })
 export class UserEntity extends Model {
   @Column({
-    type: DataTypes.NUMBER,
+    type: DataTypes.UUIDV4,
     primaryKey: true,
     autoIncrement: true,
   })
-  id: number;
+  id: string;
 
   @Column({
     type: DataType.STRING,
