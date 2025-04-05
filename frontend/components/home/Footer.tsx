@@ -16,7 +16,7 @@ export default function Footer() {
           <Link href="/policy" className="text-sm font-medium hover:underline">
             Privacy
           </Link>
-          <Link href="#" className="text-sm font-medium hover:underline">
+          <Link href="/contact" className="text-sm font-medium hover:underline">
             Contact
           </Link>
         </div>

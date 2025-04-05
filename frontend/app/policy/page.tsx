@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "@/components/home/Navbar";
 import Link from "next/link";
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp } from "lucide-react";
 
 const PolicyContent = () => {
   return (
@@ -132,10 +132,11 @@ const PolicyContent = () => {
         <hr className="max-w-3xl" />
         <div className="max-w-2xl mx-auto mb-6 px-4">
           <p className="my-2">
-            By using SplitWise, ou acknowledge that you have read and understood this Privacy Policy.
+            By using SplitWise, ou acknowledge that you have read and understood
+            this Privacy Policy.
           </p>
         </div>
-   <div className="flex justify-end my-8 mx-4">
+        <div className="flex justify-end my-8 mx-4">
           <Link href="/terms" className="bouncing-arrow">
             {" "}
             <ArrowUp />

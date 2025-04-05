@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "@/components/home/Navbar";
 import Link from "next/link";
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp } from "lucide-react";
 
 const TermContent = () => {
   return (
@@ -105,12 +105,14 @@ const TermContent = () => {
             be resolved in the applicable jurisdiction.
           </p>
           <h3 className="text-xl font-bold  mt-4 ">12. Contact Information</h3>
-          <p className="my-2 text-sm">  
-    For any questions regarding these Terms and Conditions, please contact us at   
-    <Link href="mailto:splitwise@gmail.com">  
-        <i className="font-bold"> splitwise@gmail.com</i>  
-    </Link>.  
-</p> 
+          <p className="my-2 text-sm">
+            For any questions regarding these Terms and Conditions, please
+            contact us at
+            <Link href="mailto:splitwise@gmail.com">
+              <i className="font-bold"> splitwise@gmail.com</i>
+            </Link>
+            .
+          </p>
         </div>
         <hr className="max-w-3xl mx-auto" />
         <div className="max-w-2xl mx-auto mb-6 px-4">

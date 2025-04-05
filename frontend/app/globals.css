@@ -120,16 +120,16 @@
     @apply bg-background text-foreground;
   }
 }
-.bouncing-arrow {  
-    display: inline-block; /* Necessary for animation */  
-    animation: bounce 1s infinite alternate; /* Bounce animation */  
-}  
+.bouncing-arrow {
+  display: inline-block; /* Necessary for animation */
+  animation: bounce 1s infinite alternate; /* Bounce animation */
+}
 
-@keyframes bounce {  
-    0% {  
-        transform: translateY(0); /* Starting point */  
-    }  
-    100% {  
-        transform: translateY(-10px); /* Bounce height */  
-    }  
-}  
+@keyframes bounce {
+  0% {
+    transform: translateY(0); /* Starting point */
+  }
+  100% {
+    transform: translateY(-10px); /* Bounce height */
+  }
+}
