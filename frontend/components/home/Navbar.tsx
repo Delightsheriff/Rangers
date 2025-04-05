@@ -9,7 +9,8 @@ function Navbar() {
       <div className="flex h-16 justify-between">
         <div className="flex items-center gap-2">
           <CircleDollarSign size="34" />
-          <h1 className="text-4xl font-bold">SplitWise</h1>
+          <h1 className="text-4xl font-bold">
+            <Link href="/">SplitWise</Link></h1>
         </div>
         <nav className="flex items-center gap-6">
           <Button asChild variant="default">

@@ -7,10 +7,10 @@ function Hero() {
   return (
     <section className="container px-6 grid items-center gap-6 py-12 md:grid-cols-2 md:py-24">
       <div className="flex flex-col gap-4">
-        <h1 className="text-3xl font-bold sm:text-4xl md:text-5xl">
+        <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">
           Split expenses with friends{" "}
           <span className="text-primary">hassle-free</span>
-        </h1>
+        </h2>
         <p className="text-muted-foreground md:text-lg">
           The easiest way to share bills, track group expenses, and settle debts
           with roommates, trips, and friends.
