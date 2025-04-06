@@ -6,9 +6,15 @@ import { SequelizeConfig } from './infrastructure/orm/sequelize.config';
 import { AuthModule } from './api/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './api/auth/auth.guard';
+import { AccountModule } from './api/account/account.module';
 
 @Module({
-  imports: [SequelizeModule.forRoot(SequelizeConfig), HealthModule, AuthModule],
+  imports: [
+    SequelizeModule.forRoot(SequelizeConfig),
+    HealthModule,
+    AuthModule,
+    AccountModule,
+  ],
   controllers: [],
   providers: [
     {

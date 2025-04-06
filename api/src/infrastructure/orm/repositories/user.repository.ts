@@ -36,7 +36,9 @@ export class UserRepository {
   }
 
   async findById(id: string): Promise<UserEntity | null> {
-    return await this.userModel.findByPk(id);
+    return await this.userModel.findByPk(id, {
+      attributes: { exclude: ['password'] },
+    });
   }
 
   async findByPhone(phone: string): Promise<UserEntity | null> {
