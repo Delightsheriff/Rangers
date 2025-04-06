@@ -1,15 +1,10 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { UserEntity } from '../../infrastructure/orm/entities/user.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { RepositoryModule } from 'src/infrastructure/orm/repositories/repository.module';
 
 @Module({
-  imports: [
-    SequelizeModule.forFeature([UserEntity]),
-    // ... other imports
-  ],
+  imports: [RepositoryModule],
   controllers: [AuthController],
   providers: [AuthService],
 })

@@ -68,23 +68,9 @@ export class UserEntity extends Model {
   password: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.ENUM(...Object.values(Gender)),
     allowNull: true,
     field: 'gender',
   })
-  gender: string;
-
-  @Column({
-    type: DataType.DATE,
-    allowNull: true,
-    field: 'dob',
-  })
-  dateOfBirth: Date;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-    field: 'image',
-  })
-  image: string;
+  gender: Gender;
 }

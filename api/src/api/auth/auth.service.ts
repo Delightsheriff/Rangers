@@ -1,50 +1,49 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { UserEntity } from '../../infrastructure/orm/entities/user.entity'; 
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { SignUpDto } from './signup.dto'
-import { LoginDto } from './login.dto';
+import { SignUpDto } from './dtos/signup.dto';
+import { LoginDto } from './dtos/login.dto';
+import { UserRepository } from 'src/infrastructure/orm/repositories/user.repository';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectModel(UserEntity)
-    private userModel: typeof UserEntity,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
-  async signup(SignUpDto: any) {
-    const { first_name, last_name, email, password } = SignUpDto;
+  async signup(signUpDto: SignUpDto) {
+    const { first_name, last_name, email, password } = signUpDto;
     if (!first_name || !last_name) {
-        throw new BadRequestException('First name and last name are required');
-      }
+      throw new BadRequestException('First name and last name are required');
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    const user = await this.userModel.create({
+
+    const user = await this.userRepository.create({
       firstName: first_name,
       lastName: last_name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
-    const token = this.generateToken(Number(user.id));
+    const token = this.generateToken(user.id);
     return { user, token };
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.userModel.findOne({
-      where: { email: loginDto.email },
-    });
+    const { identifier, password } = loginDto;
+    const user = await this.userRepository.findByIdentifier(identifier);
 
-    if (!user || !await bcrypt.compare(loginDto.password, user.password)) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = this.generateToken(Number(user.id));
+    const token = this.generateToken(user.id);
     return { user, token };
   }
 
-  private generateToken(userId: number) {
+  private generateToken(userId: string) {
     return jwt.sign({ userId }, process.env.JWT_SECRET || 'your-secret-key', {
       expiresIn: '24h',
     });

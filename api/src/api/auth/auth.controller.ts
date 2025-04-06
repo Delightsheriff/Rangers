@@ -1,7 +1,7 @@
 import { Controller, Post, Body, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignUpDto } from './signup.dto'
-import { LoginDto } from './login.dto';
+import { SignUpDto } from './dtos/signup.dto';
+import { LoginDto } from './dtos/login.dto';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { Public } from 'src/decorators/auth';
 
