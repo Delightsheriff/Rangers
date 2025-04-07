@@ -1,5 +1,4 @@
 import React from "react";
-import Navbar from "@/components/home/Navbar";
 import Link from "next/link";
 import { ArrowUp } from "lucide-react";
 
@@ -131,15 +130,12 @@ const TermContent = () => {
     </div>
   );
 };
-function Terms() {
+function TermsPage() {
   return (
-    <div>
-      <Navbar />
-      <main className="flex-1">
-        <TermContent />
-      </main>
-    </div>
+    <main className="flex-1">
+      <TermContent />
+    </main>
   );
 }
 
-export default Terms;
+export default TermsPage;

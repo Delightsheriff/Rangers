@@ -1,5 +1,4 @@
 import React from "react";
-import Navbar from "@/components/home/Navbar";
 import Link from "next/link";
 import { ArrowUp } from "lucide-react";
 
@@ -147,15 +146,12 @@ const PolicyContent = () => {
   );
 };
 
-function Policy() {
+function PolicyPage() {
   return (
-    <div>
-      <Navbar />
-      <main className="flex-1">
-        <PolicyContent />
-      </main>
-    </div>
+    <main className="flex-1">
+      <PolicyContent />
+    </main>
   );
 }
 
-export default Policy;
+export default PolicyPage;

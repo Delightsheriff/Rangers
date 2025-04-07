@@ -5,7 +5,7 @@ import HeroIllustration from "./HeroIllustration";
 
 function Hero() {
   return (
-    <section className="container px-6 grid items-center gap-6 py-12 md:grid-cols-2 md:py-24">
+    <section className="container  px-6 grid items-center gap-6 py-12 md:grid-cols-2 md:py-24">
       <div className="flex flex-col gap-4">
         <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">
           Split expenses with friends{" "}

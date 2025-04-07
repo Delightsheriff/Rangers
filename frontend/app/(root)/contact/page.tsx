@@ -1,11 +1,10 @@
 import React from "react";
-import Navbar from "@/components/home/Navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const ContactContent = () => {
   return (
-    <div className="flex justify-around flex-col mx-4 xl:flex-row">
+    <div className="flex justify-between flex-col mx-4 xl:flex-row">
       <section className="flex flex-col justify-end ">
         <h2 className="text-3xl md:text-4xl font-bold mb-4">Contact us</h2>
         <p className=" mb-8 text-muted-foreground w-[300px] md:w-[400px]">
@@ -54,15 +53,12 @@ const ContactContent = () => {
   );
 };
 
-function Contact() {
+function ContactPage() {
   return (
-    <div>
-      <Navbar />
-      <main className="max-w-6xl mx-auto my-8">
-        <ContactContent />
-      </main>
-    </div>
+    <main className="max-w-6xl mx-auto my-8">
+      <ContactContent />
+    </main>
   );
 }
 
-export default Contact;
+export default ContactPage;

@@ -7,7 +7,7 @@ function Navbar() {
   return (
     <header className="border-b p-4 flex h-16 justify-between items-center">
       <div className="flex items-center gap-2">
-        <CircleDollarSign size="34" className="hidden" />
+        <CircleDollarSign size="34" className="hidden md:block" />
         <h1 className="text-3xl font-bold md:text-4xl">
           <Link href="/">SplitWise</Link>
         </h1>
