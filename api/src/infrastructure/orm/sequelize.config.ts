@@ -9,7 +9,7 @@ export const SequelizeConfig: Partial<SequelizeModuleOptions> = {
   password: DB_PASSWORD,
   database: DB_NAME,
   autoLoadModels: true,
-  synchronize: true,
+  synchronize: false,
   dialectOptions: {
     connectTimeout: 60 * 1000,
   },

@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, Model, Table, DataType } from 'sequelize-typescript';
 
 export enum Gender {
   MALE = 'male',
@@ -7,7 +7,7 @@ export enum Gender {
   OTHERS = 'others',
 }
 
-@Table({ tableName: 'users' })
+@Table({ tableName: 'users', timestamps: true, underscored: true })
 export class UserEntity extends Model {
   @Column({
     type: DataTypes.UUIDV4,
@@ -17,28 +17,28 @@ export class UserEntity extends Model {
   id: string;
 
   @Column({
-    type: DataTypes.STRING,
+    type: DataType.STRING,
     allowNull: false,
     field: 'first_name',
   })
   firstName: string;
 
   @Column({
-    type: DataTypes.STRING,
+    type: DataType.STRING,
     allowNull: false,
     field: 'last_name',
   })
   lastName: string;
 
   @Column({
-    type: DataTypes.STRING,
+    type: DataType.STRING,
     allowNull: true,
     field: 'middle_name',
   })
   middleName: string;
 
   @Column({
-    type: DataTypes.STRING,
+    type: DataType.STRING,
     allowNull: true,
     unique: true,
     field: 'user_name',
@@ -46,7 +46,7 @@ export class UserEntity extends Model {
   username: string;
 
   @Column({
-    type: DataTypes.STRING,
+    type: DataType.STRING,
     allowNull: false,
     unique: true,
     field: 'email',
@@ -54,7 +54,7 @@ export class UserEntity extends Model {
   email: string;
 
   @Column({
-    type: DataTypes.STRING,
+    type: DataType.STRING,
     unique: true,
     allowNull: true,
     field: 'phone',
@@ -62,29 +62,15 @@ export class UserEntity extends Model {
   phone: string;
 
   @Column({
-    type: DataTypes.STRING,
+    type: DataType.STRING,
     field: 'password',
   })
   password: string;
 
   @Column({
-    type: DataTypes.ENUM(...Object.values(Gender)),
+    type: DataType.ENUM(...Object.values(Gender)),
     allowNull: true,
     field: 'gender',
   })
-  gender: string;
-
-  @Column({
-    type: DataTypes.DATE,
-    allowNull: true,
-    field: 'dob',
-  })
-  dateOfBirth: Date;
-
-  @Column({
-    type: DataTypes.STRING,
-    allowNull: true,
-    field: 'image',
-  })
-  image: string;
+  gender: Gender;
 }
