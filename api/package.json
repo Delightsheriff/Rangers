@@ -6,7 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "heroku-postbuild": "npm install --legacy-peer-deps && npx --yes nest build",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -20,17 +19,12 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
-  "engines": {
-    "node": "22.x",
-    "npm": "10.x"
-  },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
-    "@nestjs/cli": "^10.0.0",
     "@nestjs/sequelize": "^11.0.0",
     "@nestjs/swagger": "^11.1.0",
     "@types/bcrypt": "^5.0.2",
