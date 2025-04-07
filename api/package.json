@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "heroku-postbuild": "npm install && npx nest build",
+    "heroku-postbuild": "npm install --legacy-peer-deps && npx --yes nest build",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -30,6 +30,7 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/cli": "^10.0.0",
     "@nestjs/sequelize": "^11.0.0",
     "@nestjs/swagger": "^11.1.0",
     "@types/bcrypt": "^5.0.2",
