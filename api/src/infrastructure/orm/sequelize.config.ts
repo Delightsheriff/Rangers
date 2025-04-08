@@ -1,5 +1,12 @@
 import { SequelizeModuleOptions } from '@nestjs/sequelize';
-import { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } from 'src/config';
+import {
+  DB_HOST,
+  DB_PORT,
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME,
+  DB_SSL,
+} from 'src/config';
 
 export const SequelizeConfig: Partial<SequelizeModuleOptions> = {
   dialect: 'postgres',
@@ -13,10 +20,13 @@ export const SequelizeConfig: Partial<SequelizeModuleOptions> = {
   synchronize: false,
   dialectOptions: {
     connectTimeout: 60 * 1000,
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
+    ssl:
+      DB_SSL === 'true'
+        ? {
+            ssl: true,
+            rejectUnauthorized: false,
+          }
+        : {},
   },
   define: {
     timestamps: true,
