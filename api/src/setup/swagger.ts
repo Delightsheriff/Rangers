@@ -8,6 +8,7 @@ export function setupSwagger(app: INestApplication): void {
     .setVersion('0.1')
     .addTag('rangers-api')
     .addBearerAuth()
+    .addServer('https://rangers-xujq.onrender.com/', 'Production')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
