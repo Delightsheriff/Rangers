@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -123,6 +123,10 @@
 .bouncing-arrow {
   display: inline-block; /* Necessary for animation */
   animation: bounce 1s infinite alternate; /* Bounce animation */
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 @keyframes bounce {

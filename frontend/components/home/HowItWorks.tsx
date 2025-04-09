@@ -1,11 +1,9 @@
 export default function HowItWorks() {
   return (
-    <section className="border-t bg-muted">
+    <section id="how-it-works" className="border-t bg-muted">
       <div className="container py-12 md:py-24 px-6">
         <div className="mx-auto text-center md:max-w-[58rem]">
-          <h2 className="mb-6 text-3xl font-bold md:text-4xl">
-            How SplitWise Works
-          </h2>
+          <h2 className="mb-6 text-3xl font-bold md:text-4xl">How SplitWise Works</h2>
           <p className="mb-12 text-muted-foreground md:text-lg">
             Simplify your shared expenses in three easy steps
           </p>
@@ -33,8 +31,8 @@ export default function HowItWorks() {
             </div>
             <h3 className="mb-2 text-xl font-bold">Create Groups</h3>
             <p className="text-muted-foreground">
-              Set up groups for roommates, trips, or any shared expenses. Invite
-              friends via email or username.
+              Set up groups for roommates, trips, or any shared expenses. Invite friends via email
+              or username.
             </p>
           </div>
           <div className="rounded-lg border bg-card p-6 text-card-foreground shadow">
@@ -56,8 +54,8 @@ export default function HowItWorks() {
             </div>
             <h3 className="mb-2 text-xl font-bold">Add Expenses</h3>
             <p className="text-muted-foreground">
-              Record who paid for what and how it should be split. Upload
-              receipts and categorize expenses.
+              Record who paid for what and how it should be split. Upload receipts and categorize
+              expenses.
             </p>
           </div>
           <div className="rounded-lg border bg-card p-6 text-card-foreground shadow">
@@ -80,8 +78,8 @@ export default function HowItWorks() {
             </div>
             <h3 className="mb-2 text-xl font-bold">Settle Up</h3>
             <p className="text-muted-foreground">
-              See who owes what to whom. Mark debts as paid or request payments
-              directly through the app.
+              See who owes what to whom. Mark debts as paid or request payments directly through the
+              app.
             </p>
           </div>
         </div>
