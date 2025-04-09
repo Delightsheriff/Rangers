@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, Home, RotateCcw } from "lucide-react";
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, Home, RotateCcw } from 'lucide-react';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -13,7 +13,7 @@ interface ErrorProps {
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error("Application error:", error);
+    console.error('Application error:', error);
   }, [error]);
 
   return (
@@ -23,13 +23,10 @@ export default function Error({ error, reset }: ErrorProps) {
           <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
         </div>
 
-        <h1 className="text-3xl font-bold tracking-tight">
-          Something went wrong
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">Something went wrong</h1>
 
         <p className="text-muted-foreground">
-          We're sorry, but we encountered an unexpected error. Our team has been
-          notified.
+          We&apos;re sorry, but we encountered an unexpected error. Our team has been notified.
         </p>
 
         <div className="flex flex-col gap-2 sm:flex-row">
