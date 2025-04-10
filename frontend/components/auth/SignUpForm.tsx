@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
 import { signUp } from '@/lib/action';
+import { toast } from 'sonner';
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -44,8 +45,11 @@ export default function SignUpForm() {
     };
     const result = await signUp(signData);
     if (result.success) {
+      sessionStorage.setItem('authToken', result.data.token);
+      sessionStorage.setItem('userData', JSON.stringify(result.data.user));
+      toast('Sign up successful!');
       setIsLoading(false);
-      router.push('/auth/login');
+      router.push('/dashboard');
     }
   };
   const togglePasswordVisibility = () => {
