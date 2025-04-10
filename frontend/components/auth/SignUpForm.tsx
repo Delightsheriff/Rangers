@@ -1,44 +1,52 @@
-"use client";
+'use client';
 
-import type React from "react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Eye, EyeOff } from "lucide-react";
+import type React from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Eye, EyeOff } from 'lucide-react';
+import { signUp } from '@/lib/action';
 
 export default function SignUpForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
 
-    if (!name || !email || !password) {
-      setError("Please fill in all fields");
+    if (!firstName || !lastName || !email || !password) {
+      setError('Please fill in all fields');
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters");
+      setError('Password must be at least 8 characters');
       return;
     }
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    const signData = {
+      firstName,
+      lastName,
+      email,
+      password,
+    };
+    const result = await signUp(signData);
+    if (result.success) {
       setIsLoading(false);
-      router.push("/auth/login");
-    }, 1500);
+      router.push('/auth/login');
+    }
   };
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -51,13 +59,24 @@ export default function SignUpForm() {
           <CardContent className="pt-4">
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="firstName">First Name</Label>
                 <Input
-                  id="name"
+                  id="firstName"
                   type="text"
                   placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="John Doe"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   required
                 />
               </div>
@@ -77,7 +96,7 @@ export default function SignUpForm() {
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="********"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -88,15 +107,9 @@ export default function SignUpForm() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     onClick={togglePasswordVisibility}
                     tabIndex={-1}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -130,7 +143,7 @@ export default function SignUpForm() {
                   ></path>
                 </svg>
               ) : (
-                "Sign Up"
+                'Sign Up'
               )}
             </Button>
           </CardFooter>
