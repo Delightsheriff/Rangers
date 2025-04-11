@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Label } from "../ui/label";
@@ -7,32 +7,61 @@ import { Input } from "../ui/input";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Eye, EyeOff } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { toast } from "sonner";
+
+
+
+
+
+
+
 
 export default function SignInForm() {
-  const router = useRouter();
+  // const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!email || !password) {
-      setError("Please fill in all fields");
-      return;
-    }
+  
 
+    // if (!email || !password) {
+    //   setError("Please fill in all fields");
+    //   return;
+    // }
+if (!email.trim() || !password) {
+  setError("Please fill in all fields");
+  return;
+}
     setIsLoading(true);
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+      });
+      if (result?.error) {
+        setError(result.error);
+      } else if (result?.ok) {
+        toast.success("Signed in successfully");
+        console.log(result)
+      } else {
+        throw new Error("Unexpected response from server");
+      }
+    
+    } catch (error) {
+      console.error("Login error:", error);
+ 
+    }
+  }
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      router.push("/");
-    }, 1500);
-  };
+
+  
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
