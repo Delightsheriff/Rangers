@@ -36,8 +36,6 @@ Here’s what makes Educare stand out:
   Secure user authentication and authorization using JWT (JSON Web Tokens) and Passport.js.
 
 
-
-
 ---
 
 ## Setup 🛠️
@@ -85,27 +83,25 @@ Here’s what makes Educare stand out:
 3. Start the backend server:
 
    ```bash
-   npm start
+   nest start
    ```
 
 4. The backend API will be available at:
 
    ```bash
-   http://localhost:5000
+   http://localhost:3000
    ```
 
 ---
 
 ## Environment Variables 🔑
 
-To run the project, you need to set up environment variables. Create a `.env` file in the `backend` directory with the following variables:
+To run the project, you need to set up environment variables. Create a `.env` file in the `api` directory with the following variables:
 
 ```env
 # Backend .env file
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/educare
-JWT_SECRET=your_jwt_secret_key
-AI_API_KEY=your_ai_api_key
+PORT=3000
+
 ```
 
 ---
