@@ -33,12 +33,11 @@ export default function SignInForm() {
         identifier: email,
         password,
       });
-      console.log('result:', result);
       if (result?.error) {
         setError(result.error);
       } else if (result?.ok) {
         toast.success('Signed in successfully');
-        console.log(result);
+
         router.push('/dashboard');
       } else {
         throw new Error('Unexpected response from server');
