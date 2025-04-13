@@ -83,7 +83,7 @@ Here’s what makes Educare stand out:
 3. Start the backend server:
 
    ```bash
-   nest start
+   npm run start
    ```
 
 4. The backend API will be available at:
@@ -110,7 +110,7 @@ PORT=3000
 
 ### Frontend
 
-- **Next.js**: For building the user interface.
+- **Next.js with Typescript**: For building the user interface.
 - **Tailwind CSS**: For styling the components.
 - **Next-auth**: For making API calls for authetication and authorisation.
 
