@@ -83,7 +83,7 @@ Here’s what makes Educare stand out:
 3. Start the backend server:
 
    ```bash
-   nest start
+   npm run start
    ```
 
 4. The backend API will be available at:
