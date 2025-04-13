@@ -9,7 +9,7 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: {
+        identifier: {
           label: 'Email',
           type: 'text',
         },
@@ -20,13 +20,14 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
+          console.log('credentials', credentials);
           const response = await fetch(`${URL}/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              email: credentials?.email,
+              identifier: credentials?.identifier,
               password: credentials?.password,
             }),
           });

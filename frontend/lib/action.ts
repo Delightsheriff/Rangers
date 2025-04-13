@@ -21,7 +21,6 @@ export async function signUp(signData: {
       console.log('Error:', result);
       throw new Error(result.message || result.error || 'Something went wrong!');
     }
-    console.log('Success:', result);
     return {
       success: true,
       data: result,

@@ -1,67 +1,53 @@
-"use client";
-// import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { Card, CardContent, CardFooter } from "../ui/card";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import Link from "next/link";
-import { Button } from "../ui/button";
-import { Eye, EyeOff } from "lucide-react";
-import { signIn } from "next-auth/react";
-import { toast } from "sonner";
-
-
-
-
-
-
-
+'use client';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { Card, CardContent, CardFooter } from '../ui/card';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import Link from 'next/link';
+import { Button } from '../ui/button';
+import { Eye, EyeOff } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+import { toast } from 'sonner';
 
 export default function SignInForm() {
-  // const router = useRouter();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
 
-  
-
-    // if (!email || !password) {
-    //   setError("Please fill in all fields");
-    //   return;
-    // }
-if (!email.trim() || !password) {
-  setError("Please fill in all fields");
-  return;
-}
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
     setIsLoading(true);
     try {
-      const result = await signIn("credentials", {
-        email,
+      const result = await signIn('credentials', {
+        redirect: false, // Prevent automatic redirect
+        identifier: email,
         password,
       });
+      console.log('result:', result);
       if (result?.error) {
         setError(result.error);
       } else if (result?.ok) {
-        toast.success("Signed in successfully");
-        console.log(result)
+        toast.success('Signed in successfully');
+        console.log(result);
+        router.push('/dashboard');
       } else {
-        throw new Error("Unexpected response from server");
+        throw new Error('Unexpected response from server');
       }
-    
     } catch (error) {
-      console.error("Login error:", error);
- 
+      console.error('Login error:', error);
     }
-  }
+  };
 
-
-  
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -97,7 +83,7 @@ if (!email.trim() || !password) {
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="********"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -108,15 +94,9 @@ if (!email.trim() || !password) {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     onClick={togglePasswordVisibility}
                     tabIndex={-1}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
@@ -148,7 +128,7 @@ if (!email.trim() || !password) {
                   ></path>
                 </svg>
               ) : (
-                "Sign In"
+                'Sign In'
               )}
             </Button>
           </CardFooter>
