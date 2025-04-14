@@ -16,17 +16,25 @@ export async function signUp(signData: {
       },
       body: JSON.stringify(signData),
     });
+
     const result = await response.json();
+
     if (!response.ok) {
-      console.log('Error:', result);
-      throw new Error(result.message || result.error || 'Something went wrong!');
+      return {
+        success: false,
+        error: result.message || result.error || 'Something went wrong!',
+      };
     }
+
     return {
       success: true,
       data: result,
     };
   } catch (error) {
     console.error('Error during sign up:', error);
-    throw new Error('Sign up failed. Please try again later.');
+    return {
+      success: false,
+      error: 'Sign up failed. Please try again later.',
+    };
   }
 }

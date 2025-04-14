@@ -43,13 +43,20 @@ export default function SignUpForm() {
       email,
       password,
     };
+
     const result = await signUp(signData);
+
+    setIsLoading(false);
+
     if (result.success) {
-      toast('Sign up successful!');
-      setIsLoading(false);
+      toast.success('Sign up successful!');
       router.push('/auth/login');
+    } else {
+      // Display the error from the server
+      setError(result.error || 'Sign up failed. Please try again.');
     }
   };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -65,7 +72,7 @@ export default function SignUpForm() {
                 <Input
                   id="firstName"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="John"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
@@ -76,7 +83,7 @@ export default function SignUpForm() {
                 <Input
                   id="lastName"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Doe"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
@@ -118,7 +125,11 @@ export default function SignUpForm() {
                   Password must be at least 8 characters long
                 </p>
               </div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && (
+                <div className="p-2 rounded-md bg-destructive/10 border border-destructive">
+                  <p className="text-sm text-destructive font-medium">{error}</p>
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter className="mt-4">
