@@ -45,11 +45,9 @@ export default function SignUpForm() {
     };
     const result = await signUp(signData);
     if (result.success) {
-      sessionStorage.setItem('authToken', result.data.token);
-      sessionStorage.setItem('userData', JSON.stringify(result.data.user));
       toast('Sign up successful!');
       setIsLoading(false);
-      router.push('/dashboard');
+      router.push('/auth/login');
     }
   };
   const togglePasswordVisibility = () => {
