@@ -125,11 +125,7 @@ export default function SignUpForm() {
                   Password must be at least 8 characters long
                 </p>
               </div>
-              {error && (
-                <div className="p-2 rounded-md bg-destructive/10 border border-destructive">
-                  <p className="text-sm text-destructive font-medium">{error}</p>
-                </div>
-              )}
+              {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
           </CardContent>
           <CardFooter className="mt-4">

@@ -39,7 +39,10 @@ export const authOptions: NextAuthOptions = {
 
           if (!response.ok) {
             console.error('Error:', result);
-            throw new Error(result.message || result.error || 'Something went wrong');
+            // Return a structured error instead of throwing
+            return Promise.reject(
+              new Error(result.message || result.error || 'Something went wrong'),
+            );
           }
 
           if (result.user) {
