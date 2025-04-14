@@ -16,11 +16,19 @@ export async function signUp(signData: {
       },
       body: JSON.stringify(signData),
     });
+
     const result = await response.json();
+
     if (!response.ok) {
+      // Check for specific error conditions
+      if (response.status === 406 && result.message === 'Email in use') {
+        throw new Error('This email is already in use. Please use another one or log in.');
+      }
+
       console.log('Error:', result);
       throw new Error(result.message || result.error || 'Something went wrong!');
     }
+
     return {
       success: true,
       data: result,

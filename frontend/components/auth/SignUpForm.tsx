@@ -65,7 +65,7 @@ export default function SignUpForm() {
                 <Input
                   id="firstName"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="John"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
@@ -76,7 +76,7 @@ export default function SignUpForm() {
                 <Input
                   id="lastName"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Doe"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
