@@ -1,38 +1,51 @@
-"use client";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { Card, CardContent, CardFooter } from "../ui/card";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import Link from "next/link";
-import { Button } from "../ui/button";
-import { Eye, EyeOff } from "lucide-react";
+'use client';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { Card, CardContent, CardFooter } from '../ui/card';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import Link from 'next/link';
+import { Button } from '../ui/button';
+import { Eye, EyeOff } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+import { toast } from 'sonner';
 
 export default function SignInForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-
-    if (!email || !password) {
-      setError("Please fill in all fields");
-      return;
-    }
-
     setIsLoading(true);
+    setError('');
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const result = await signIn('credentials', {
+        redirect: false, // Prevent automatic redirect
+        identifier: email,
+        password,
+      });
+
+      if (result?.error) {
+        setError(result.error);
+      } else if (result?.ok) {
+        toast.success('Signed in successfully');
+        router.push('/dashboard');
+      } else {
+        setError('Unexpected response from server');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+    } finally {
       setIsLoading(false);
-      router.push("/");
-    }, 1500);
+    }
   };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -48,7 +61,7 @@ export default function SignInForm() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="email@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -68,7 +81,7 @@ export default function SignInForm() {
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="********"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -79,15 +92,9 @@ export default function SignInForm() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     onClick={togglePasswordVisibility}
                     tabIndex={-1}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
@@ -119,7 +126,7 @@ export default function SignInForm() {
                   ></path>
                 </svg>
               ) : (
-                "Sign In"
+                'Sign In'
               )}
             </Button>
           </CardFooter>
