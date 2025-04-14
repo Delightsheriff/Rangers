@@ -20,30 +20,29 @@ export default function SignInForm() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     setError('');
 
-    if (!email || !password) {
-      setError('Please fill in all fields');
-      return;
-    }
-    setIsLoading(true);
     try {
       const result = await signIn('credentials', {
         redirect: false, // Prevent automatic redirect
         identifier: email,
         password,
       });
+
       if (result?.error) {
         setError(result.error);
       } else if (result?.ok) {
         toast.success('Signed in successfully');
-
         router.push('/dashboard');
       } else {
-        throw new Error('Unexpected response from server');
+        setError('Unexpected response from server');
       }
     } catch (error) {
       console.error('Login error:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 

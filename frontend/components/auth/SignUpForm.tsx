@@ -43,13 +43,20 @@ export default function SignUpForm() {
       email,
       password,
     };
+
     const result = await signUp(signData);
+
+    setIsLoading(false);
+
     if (result.success) {
-      toast('Sign up successful!');
-      setIsLoading(false);
+      toast.success('Sign up successful!');
       router.push('/auth/login');
+    } else {
+      // Display the error from the server
+      setError(result.error || 'Sign up failed. Please try again.');
     }
   };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
