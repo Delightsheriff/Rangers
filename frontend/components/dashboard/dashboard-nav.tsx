@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   Users,
@@ -11,10 +11,7 @@ import {
   FileText,
   Settings,
   Wallet,
-} from "lucide-react";
-
-
-
+} from 'lucide-react';
 
 export default function DashboardNav() {
   const pathname = usePathname();

@@ -1,13 +1,14 @@
 # Project Overview
+
 Team Rangers participated in ADC Hackathon 2025 and this concept is to create an app where users can log shared expenses (e.g., for roommates, trips, or group outings), and it calculates who owes what amount.
 
 ## SplitWise
+
 ---
 
 ## About ✍️
 
-An app where users can log shared expenses (e.g., for roommates, trips, or group outings), and it calculates who owes what amount.
----
+## An app where users can log shared expenses (e.g., for roommates, trips, or group outings), and it calculates who owes what amount.
 
 ## Features 🌠
 
@@ -16,13 +17,13 @@ Here’s what makes Educare stand out:
 ### Frontend Features
 
 - 📖 **User Authentication**:
-         Users are able to create account and login to their account to create expense data
+  Users are able to create account and login to their account to create expense data
 
 - 🏆 **Create a Group**:
-         Users are able to create a group and invite friends so we can split expenses together.
+  Users are able to create a group and invite friends so we can split expenses together.
 
 - 🌐 **Add an Expense**:
-         As a user, you are able to add an expense with details like amount, payer, and participants so we can track costs.
+  As a user, you are able to add an expense with details like amount, payer, and participants so we can track costs.
 
 - 🤖 **View Split Costs**:
   Use cutting-edge AI technology to get instant solutions and insights into complex concepts.
@@ -34,7 +35,6 @@ Here’s what makes Educare stand out:
 
 - 🔒 **Authentication & Authorization**:
   Secure user authentication and authorization using JWT (JSON Web Tokens) and Passport.js.
-
 
 ---
 
