@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'SplitWise',
-  description: '',
+  description: 'An app where users can log shared expenses (e.g., for roommates, trips, or group outings), and it calculates who owes what amount.',
 };
 
 export default function RootLayout({
