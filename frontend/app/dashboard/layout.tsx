@@ -1,12 +1,8 @@
-import type React from "react";
-import DashboardHeader from "@/components/dashboard/dashboard-header";
-import DashboardNav from "@/components/dashboard/dashboard-nav";
+import type React from 'react';
+import DashboardHeader from '@/components/dashboard/dashboard-header';
+import DashboardNav from '@/components/dashboard/dashboard-nav';
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col container mx-auto">
       <DashboardHeader />

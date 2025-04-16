@@ -1,5 +1,5 @@
-import { Bell } from "lucide-react";
-import Link from "next/link";
+import { Bell } from 'lucide-react';
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,10 +7,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export function NotificationsDropdown() {
   return (
@@ -33,8 +33,8 @@ export function NotificationsDropdown() {
             </Avatar>
             <div className="grid gap-1">
               <p className="text-sm font-medium">
-                <span className="font-semibold">Taylor</span> added &quot;Dinner
-                at Seafood Palace&quot; ($145.75)
+                <span className="font-semibold">Taylor</span> added &quot;Dinner at Seafood
+                Palace&quot; ($145.75)
               </p>
               <p className="text-xs text-muted-foreground">Just now</p>
             </div>
@@ -45,8 +45,8 @@ export function NotificationsDropdown() {
             </Avatar>
             <div className="grid gap-1">
               <p className="text-sm font-medium">
-                <span className="font-semibold">Morgan</span> requested $58.50
-                for &quot;Airport Taxi&quot;
+                <span className="font-semibold">Morgan</span> requested $58.50 for &quot;Airport
+                Taxi&quot;
               </p>
               <p className="text-xs text-muted-foreground">2 hours ago</p>
             </div>
@@ -57,8 +57,7 @@ export function NotificationsDropdown() {
             </Avatar>
             <div className="grid gap-1">
               <p className="text-sm font-medium">
-                <span className="font-semibold">Jordan</span> settled up with
-                you ($120.00)
+                <span className="font-semibold">Jordan</span> settled up with you ($120.00)
               </p>
               <p className="text-xs text-muted-foreground">Yesterday</p>
             </div>

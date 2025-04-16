@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   Users,
@@ -11,7 +11,7 @@ import {
   FileText,
   Settings,
   Wallet,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface MobileNavProps {
   onNavItemClick?: () => void;
@@ -22,53 +22,53 @@ export default function MobileNav({ onNavItemClick }: MobileNavProps) {
 
   const navItems = [
     {
-      name: "Dashboard",
-      href: "/dashboard",
+      name: 'Dashboard',
+      href: '/dashboard',
       icon: LayoutDashboard,
-      id: "dashboard",
+      id: 'dashboard',
     },
     {
-      name: "Groups",
-      href: "/dashboard/groups",
+      name: 'Groups',
+      href: '/dashboard/groups',
       icon: Users,
-      id: "groups",
+      id: 'groups',
     },
     {
-      name: "Expenses",
-      href: "/dashboard/expenses",
+      name: 'Expenses',
+      href: '/dashboard/expenses',
       icon: Receipt,
-      id: "expenses",
+      id: 'expenses',
     },
     {
-      name: "Settlements",
-      href: "/dashboard/settlements",
+      name: 'Settlements',
+      href: '/dashboard/settlements',
       icon: CreditCard,
-      id: "settlements",
+      id: 'settlements',
     },
     {
-      name: "Reports",
-      href: "/dashboard/reports",
+      name: 'Reports',
+      href: '/dashboard/reports',
       icon: FileText,
-      id: "reports",
+      id: 'reports',
     },
     {
-      name: "Wallet",
-      href: "/dashboard/wallet",
+      name: 'Wallet',
+      href: '/dashboard/wallet',
       icon: Wallet,
-      id: "wallet",
+      id: 'wallet',
     },
     {
-      name: "Settings",
-      href: "/dashboard/settings",
+      name: 'Settings',
+      href: '/dashboard/settings',
       icon: Settings,
-      id: "settings",
+      id: 'settings',
     },
   ];
 
   // Determine active item based on the current path
   const getActiveItem = () => {
-    const path = pathname.split("/")[2]; // Get the second segment after /dashboard/
-    if (!path) return "dashboard";
+    const path = pathname.split('/')[2]; // Get the second segment after /dashboard/
+    if (!path) return 'dashboard';
     return path;
   };
 
@@ -100,9 +100,7 @@ export default function MobileNav({ onNavItemClick }: MobileNavProps) {
         </Link>
       </div>
       <div className="flex-1 overflow-auto py-2">
-        <h3 className="px-4 py-2 text-sm font-medium text-muted-foreground">
-          Menu
-        </h3>
+        <h3 className="px-4 py-2 text-sm font-medium text-muted-foreground">Menu</h3>
         <nav className="grid gap-1 px-2">
           {navItems.map((item) => (
             <Link
@@ -110,10 +108,8 @@ export default function MobileNav({ onNavItemClick }: MobileNavProps) {
               href={item.href}
               onClick={onNavItemClick}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                activeItem === item.id
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted",
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                activeItem === item.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
               )}
             >
               <item.icon className="h-5 w-5" />

@@ -1,7 +1,7 @@
-import React from "react";
-import { CircleDollarSign } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import React from 'react';
+import { CircleDollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 function Navbar() {
   return (

@@ -34,8 +34,8 @@ export default function Testimonials() {
             </div>
           </div>
           <p className="text-muted-foreground">
-            &quot;SplitWise has made sharing expenses with my roommates so easy.
-            No more awkward conversations about who owes what!&quot;
+            &quot;SplitWise has made sharing expenses with my roommates so easy. No more awkward
+            conversations about who owes what!&quot;
           </p>
         </div>
         <div className="rounded-lg border p-6">
@@ -58,14 +58,12 @@ export default function Testimonials() {
             </div>
             <div>
               <h3 className="font-semibold">Kunal Saini</h3>
-              <p className="text-sm text-muted-foreground">
-                Costa Rica Trip 2025
-              </p>
+              <p className="text-sm text-muted-foreground">Costa Rica Trip 2025</p>
             </div>
           </div>
           <p className="text-muted-foreground">
-            &quot; Used this app for our vacation and it was a game-changer. We
-            could all see expenses in real-time and settle up easily.&quot;
+            &quot; Used this app for our vacation and it was a game-changer. We could all see
+            expenses in real-time and settle up easily.&quot;
           </p>
         </div>
         <div className="rounded-lg border p-6">
@@ -88,14 +86,12 @@ export default function Testimonials() {
             </div>
             <div>
               <h3 className="font-semibold">Delight Amadi-Sheriff</h3>
-              <p className="text-sm text-muted-foreground">
-                Office Lunch Group
-              </p>
+              <p className="text-sm text-muted-foreground">Office Lunch Group</p>
             </div>
           </div>
           <p className="text-muted-foreground">
-            &quot;Perfect for our office lunch rotation. We can see exactly
-            who&quot;s turn it is to pay and keep everything fair.&quot;
+            &quot;Perfect for our office lunch rotation. We can see exactly who&quot;s turn it is to
+            pay and keep everything fair.&quot;
           </p>
         </div>
       </div>
