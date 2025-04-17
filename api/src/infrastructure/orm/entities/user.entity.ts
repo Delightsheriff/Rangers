@@ -1,4 +1,3 @@
-import { DataTypes } from 'sequelize';
 import { Column, Model, Table, DataType } from 'sequelize-typescript';
 import { BelongsToMany } from 'sequelize-typescript';
 import { GroupEntity } from './group.entity';
@@ -17,7 +16,7 @@ export class UserEntity extends Model {
     primaryKey: true,
     autoIncrement: true,
   })
-  id: number;
+  id: string;
 
   @Column({
     type: DataType.STRING,

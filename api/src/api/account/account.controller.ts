@@ -20,7 +20,7 @@ export class AccountController {
   @ApiOkResponse({ type: UserEntity })
   @ApiNotFoundResponse({ description: 'User not found' })
   getProfile(@AuthUser() user: UserEntity) {
-    const data = this.accountService.getAccountDetails(user.id);
+    const data = this.accountService.getAccountDetails(user.id.toString());
 
     return data;
   }
@@ -33,7 +33,7 @@ export class AccountController {
     @Body() updateData: UpdateAccountDto,
     @Res() res: Response,
   ) {
-    await this.accountService.updateAccountDetails(user.id, updateData);
+    await this.accountService.updateAccountDetails(user.id.toString(), updateData);
 
     res.status(HttpStatus.NO_CONTENT).send();
   }

@@ -5,7 +5,7 @@ import { GroupEntity } from './group.entity';
 @Table({ tableName: 'user_groups', timestamps: false, underscored: true })
 export class GroupMemberEntity extends Model {
   @ForeignKey(() => UserEntity)
-  @Column
+  @Column({ type: DataType.INTEGER })
   userId: number;
 
   @ForeignKey(() => GroupEntity)

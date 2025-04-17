@@ -30,13 +30,13 @@ export class AccountService {
     const existingUser = await this.userRepository.findByUsername(
       updateData.username,
     );
-    if (existingUser && existingUser.id !== userId) {
+    if (existingUser && existingUser.id.toString() !== userId) {
       throw new NotFoundException('Username already exists');
     }
     const existingPhone = await this.userRepository.findByPhone(
       updateData.phone,
     );
-    if (existingPhone && existingPhone.id !== userId) {
+    if (existingPhone && existingPhone.id.toString() !== userId) {
       throw new NotFoundException('Phone already exists');
     }
 
