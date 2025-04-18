@@ -16,7 +16,7 @@ export class UserEntity extends Model {
     primaryKey: true,
     autoIncrement: true,
   })
-  id: string;
+  id: number;
 
   @Column({
     type: DataType.STRING,

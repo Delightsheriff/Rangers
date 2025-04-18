@@ -10,7 +10,7 @@ module.exports = {
         primaryKey: true,
       },
       group_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'groups', key: 'id' },
         onDelete: 'CASCADE',

@@ -1,4 +1,4 @@
-import { Table, Model, Column, DataType, BelongsToMany, AutoIncrement } from 'sequelize-typescript';
+import { Table, Model, Column, DataType, BelongsToMany, AutoIncrement, AllowNull } from 'sequelize-typescript';
 import { UserEntity } from './user.entity';
 import { GroupMemberEntity } from './group-member.entity';
 
