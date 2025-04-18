@@ -30,7 +30,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const token = this.generateToken(user.id);
+    const token = this.generateToken(user.id.toString());
     return {
       user: {
         id: user.id,
@@ -53,7 +53,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = this.generateToken(user.id);
+    const token = this.generateToken(user.id.toString());
     return {
       user: {
         id: user.id,
