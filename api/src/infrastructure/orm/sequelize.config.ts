@@ -21,12 +21,11 @@ export const SequelizeConfig: Partial<SequelizeModuleOptions> = {
   dialectOptions: {
     connectTimeout: 60 * 1000,
     ssl:
-      DB_SSL === 'true'
-        ? {
+        {
             ssl: true,
             rejectUnauthorized: false,
           }
-        : {},
+        ,
   },
   define: {
     timestamps: true,
