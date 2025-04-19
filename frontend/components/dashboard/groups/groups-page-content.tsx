@@ -2,11 +2,16 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Group } from '@/interface/group';
 import { Search, UserPlus, Users } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function GroupsPageContent() {
+interface groupsProps {
+  groups: Group[];
+}
+
+export default function GroupsPageContent({ groups }: groupsProps) {
   return (
     <>
       <div className="mb-6 flex flex-col gap-4 md:flex-row">

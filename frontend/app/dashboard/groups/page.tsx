@@ -1,8 +1,56 @@
 import GroupsPageContent from '@/components/dashboard/groups/groups-page-content';
 import { Button } from '@/components/ui/button';
+import { Group } from '@/interface/group';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
+
+const groups: Group[] = [
+  {
+    id: '1',
+    name: 'Easter 2025 camp trip',
+    members: 4,
+    expenses: 12,
+    totalAmount: 1245.6,
+    youOwe: 0,
+    youAreOwed: 320.0,
+    isActive: true,
+    description: 'Expenses for our shared apartment',
+  },
+  {
+    id: '2',
+    name: 'Spring Break 2025',
+    members: 5,
+    expenses: 8,
+    totalAmount: 984.25,
+    youOwe: 68.08,
+    youAreOwed: 0,
+    isActive: true,
+    description: 'Our awesome spring break trip',
+  },
+  {
+    id: '3',
+    name: 'Dinner Club',
+    members: 6,
+    expenses: 15,
+    totalAmount: 1325.5,
+    youOwe: 0,
+    youAreOwed: 120.0,
+    isActive: true,
+    description: 'Monthly dinner outings with friends',
+  },
+  {
+    id: '4',
+    name: 'Office Lunch Group',
+    members: 8,
+    expenses: 20,
+    totalAmount: 845.75,
+    youOwe: 0,
+    youAreOwed: 80.0,
+    isActive: true,
+    description: 'Lunch rotation with coworkers',
+  },
+];
 
 export default async function page() {
   return (
@@ -19,7 +67,7 @@ export default async function page() {
           </Button>
         </Link>
       </div>
-      <GroupsPageContent />
+      <GroupsPageContent groups={groups} />
     </main>
   );
 }
