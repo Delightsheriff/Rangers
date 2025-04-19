@@ -7,6 +7,7 @@ import { AuthModule } from './api/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './api/auth/auth.guard';
 import { AccountModule } from './api/account/account.module';
+import { UserModule } from './infrastructure/orm/entities/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AccountModule } from './api/account/account.module';
     HealthModule,
     AuthModule,
     AccountModule,
+    UserModule,
   ],
   controllers: [],
   providers: [
