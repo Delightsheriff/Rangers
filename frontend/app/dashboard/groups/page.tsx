@@ -19,7 +19,7 @@ const groups: Group[] = [
   },
   {
     id: '2',
-    name: 'Spring Break 2025',
+    name: 'Spring Break 2024',
     members: 5,
     expenses: 8,
     totalAmount: 984.25,

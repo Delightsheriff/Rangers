@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Table, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Group } from '@/interface/group';
 import { FileText, Search, UserPlus, Users } from 'lucide-react';
 import Link from 'next/link';
@@ -60,7 +61,18 @@ export default function GroupsPageContent({ groups }: groupsProps) {
               )}
             </div>
           ) : (
-            <p>Testing</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Members</TableHead>
+                  <TableHead>Expenses</TableHead>
+                  <TableHead>Total Amount</TableHead>
+                  <TableHead>Balance</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+            </Table>
           )}
         </CardContent>
       </Card>
