@@ -19,6 +19,6 @@ export class GroupService {
         }
         const group = await this.groupModel.create({ name });
         await group.$set('members', users);
-        return group;
+        return {group, users};
       }
     }
