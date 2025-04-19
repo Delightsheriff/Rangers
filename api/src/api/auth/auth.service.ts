@@ -40,6 +40,7 @@ export class AuthService {
         username: user.username,
         phone: user.phone,
         gender: user.gender,
+        email: user.email,
       },
       token,
     };
@@ -54,6 +55,7 @@ export class AuthService {
     }
 
     const token = this.generateToken(user.id.toString());
+    console.log(user);
     return {
       user: {
         id: user.id,
@@ -63,6 +65,7 @@ export class AuthService {
         username: user.username,
         phone: user.phone,
         gender: user.gender,
+        email: user.email
       },
       token,
     };
