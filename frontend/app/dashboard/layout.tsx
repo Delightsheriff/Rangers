@@ -4,7 +4,7 @@ import DashboardNav from '@/components/dashboard/dashboard-nav';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col container mx-auto">
+    <div className="flex min-h-screen flex-col mx-w-[1280px] mx-auto">
       <DashboardHeader />
       <div className="flex flex-1">
         <DashboardNav />

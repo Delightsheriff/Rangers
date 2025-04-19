@@ -45,6 +45,7 @@ export const authOptions: NextAuthOptions = {
             );
           }
 
+          console.log('🚀 ~ result:', result);
           if (result.user) {
             return {
               ...result.user,
