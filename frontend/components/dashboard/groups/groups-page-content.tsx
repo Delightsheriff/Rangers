@@ -61,7 +61,7 @@ export default function GroupsPageContent({ groups }: groupsProps) {
   };
 
   return (
-    <>
+    <section className="w-full">
       {/* Search Bar */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row">
         <div className="relative flex-1">
@@ -97,6 +97,7 @@ export default function GroupsPageContent({ groups }: groupsProps) {
             </div>
           ) : (
             <Table>
+              {/* <TableHeader className="hidden md:table-header-group"> */}
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
@@ -292,6 +293,6 @@ export default function GroupsPageContent({ groups }: groupsProps) {
           </CardContent>
         </Card>
       </div>
-    </>
+    </section>
   );
 }
