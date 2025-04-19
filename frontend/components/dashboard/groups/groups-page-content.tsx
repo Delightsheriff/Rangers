@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Group } from '@/interface/group';
-import { Search, UserPlus, Users } from 'lucide-react';
+import { FileText, Search, UserPlus, Users } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 interface groupsProps {
@@ -12,16 +13,28 @@ interface groupsProps {
 }
 
 export default function GroupsPageContent({ groups }: groupsProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredGroups = groups.filter((group) => {
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        group.name.toLowerCase().includes(query) || group.description.toLowerCase().includes(query)
+      );
+    }
+    return true;
+  });
   return (
     <>
+      {/* Search Bar */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search groups..."
             className="pl-8"
-            // value={searchQuery}
-            // onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
@@ -30,6 +43,26 @@ export default function GroupsPageContent({ groups }: groupsProps) {
         <CardHeader>
           <CardTitle>My Groups</CardTitle>
         </CardHeader>
+        <CardContent>
+          {filteredGroups.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <FileText className="h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-medium">No groups found</h3>
+              <p className="mt-2 text-center text-sm text-muted-foreground">
+                {searchQuery
+                  ? 'Try adjusting your search query'
+                  : 'Create your first group to start tracking expenses'}
+              </p>
+              {!searchQuery && (
+                <Link href="/groups/new" className="mt-4">
+                  <Button>Create Group</Button>
+                </Link>
+              )}
+            </div>
+          ) : (
+            <p>Testing</p>
+          )}
+        </CardContent>
       </Card>
 
       {/* Footer */}
