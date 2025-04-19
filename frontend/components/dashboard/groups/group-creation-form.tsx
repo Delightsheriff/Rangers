@@ -23,10 +23,6 @@ interface creationFormProps {
 }
 
 export default function GroupCreationForm({ creatorEmail }: creationFormProps) {
-  // { creatorEmail = '
-  //   const creatorEmail = 'alex@example.com';
-  //   const creatorEmail = session?.user?.email;
-
   const [groupName, setGroupName] = useState('');
   const [groupDescription, setGroupDescription] = useState('');
   const [members, setMembers] = useState([{ id: 'member-1', email: creatorEmail, isFixed: true }]);
