@@ -60,7 +60,7 @@ export default async function page() {
           <h1 className="text-3xl font-bold">Groups</h1>
           <p className="text-muted-foreground">Manage your expense sharing groups</p>
         </div>
-        <Link href="/groups/new">
+        <Link href="/dashboard/groups/new">
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
             Create Group

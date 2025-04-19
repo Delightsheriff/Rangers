@@ -264,7 +264,7 @@ export default function GroupsPageContent({ groups }: groupsProps) {
               <p className="mb-4 text-sm text-muted-foreground">
                 Start tracking expenses with friends, roommates, or colleagues.
               </p>
-              <Link href="/groups/new">
+              <Link href="/dashboard/groups/new">
                 <Button className="w-full">Create Group</Button>
               </Link>
             </div>
