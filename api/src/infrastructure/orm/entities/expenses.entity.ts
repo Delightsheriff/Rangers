@@ -1,6 +1,6 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript';
 import { UserEntity } from './user.entity';
-import { ExpenseParticipant } from './expense-participant.entity';
+import { ExpenseParticipant } from './expenseParticipant.entity';
 
 @Table
 export class Expense extends Model<Expense> {
