@@ -1,8 +1,12 @@
+import GroupCreationForm from '@/components/dashboard/groups/group-creation-form';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 
-export default function page() {
+export default async function page() {
+  const session = await getServerSession();
+  console.log('🚀 ~ session:', session);
   return (
     <main className="flex-1 p-6">
       <div className="mb-6">
@@ -16,6 +20,7 @@ export default function page() {
           <h1 className="text-2xl font-bold">Create a New Group</h1>
         </div>
       </div>
+      <GroupCreationForm creatorEmail={session?.user?.email ?? ''} />
     </main>
   );
 }
