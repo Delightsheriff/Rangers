@@ -15,8 +15,8 @@ function Hero() {
           trips, and friends.
         </p>
         <div className="flex gap-4">
-          <Link href="/auth/signup">
-            <Button size="lg" className="gap-2">
+          <Link href="/auth/signup" className="bouncing">
+            <Button size="lg" className="gap-4 ">
               Get Started
               <svg
                 xmlns="http://www.w3.org/2000/svg"

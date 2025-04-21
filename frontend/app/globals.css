@@ -120,8 +120,8 @@
     @apply bg-background text-foreground;
   }
 }
-.bouncing-arrow {
-  display: inline-block; /* Necessary for animation */
+.bouncing {
+  display: block; /* Necessary for animation */
   animation: bounce 1s infinite alternate; /* Bounce animation */
 }
 
@@ -130,10 +130,14 @@ html {
 }
 
 @keyframes bounce {
-  0% {
+  0%,
+  100% {
     transform: translateY(0); /* Starting point */
   }
-  100% {
+  40% {
+    transform: translateY(-20px); /* Bounce height */
+  }
+  60% {
     transform: translateY(-10px); /* Bounce height */
   }
 }
