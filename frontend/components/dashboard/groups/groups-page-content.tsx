@@ -142,15 +142,15 @@ export default function GroupsPageContent({ groups }: groupsProps) {
                           group.youOwe > 0
                             ? 'text-red-500'
                             : group.youAreOwed > 0
-                            ? 'text-green-500'
-                            : '',
+                              ? 'text-green-500'
+                              : '',
                         )}
                       >
                         {group.youOwe > 0
                           ? `-$${group.youOwe.toFixed(2)}`
                           : group.youAreOwed > 0
-                          ? `+$${group.youAreOwed.toFixed(2)}`
-                          : '$0.00'}
+                            ? `+$${group.youAreOwed.toFixed(2)}`
+                            : '$0.00'}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
