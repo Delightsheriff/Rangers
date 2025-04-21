@@ -76,6 +76,6 @@ export class UserEntity extends Model {
   })
   gender: Gender;
 
-    @BelongsToMany(() => GroupEntity, () => GroupMemberEntity)
+  @BelongsToMany(() => GroupEntity, () => GroupMemberEntity)
   groups: GroupEntity[];
 }
