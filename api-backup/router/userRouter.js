@@ -6,6 +6,7 @@ const {
   register,
   login,
   logout,
+  refreshToken,
   update_a_user,
   delete_a_user,
   get_a_user,
@@ -21,6 +22,9 @@ const authRouter = Router()
 
   // Route to handle user logout
   .post('/auth/logout', logout)
+
+  // Route to refresh access token
+  .post('/auth/refresh-token', refreshToken)
 
   // Route to update a user's information by ID
   .put('/auth/update/:id', update_a_user)
