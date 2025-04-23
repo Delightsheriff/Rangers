@@ -6,15 +6,6 @@ const jwt = require('jsonwebtoken');
 const register = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
 
-  if (!firstName || !lastName || !email || !password) {
-    res.status(400).json({ msg: 'All fields are required' });
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ msg: 'Invalid email address' });
-  }
-
   try {
     const user = await userModel.findOne({ email });
     if (user) {
@@ -30,9 +21,9 @@ const register = async (req, res, next) => {
     });
 
     await newUser.save();
-    res.status(200).json(newUser);
+    res.status(201).json(newUser);
   } catch (error) {
-    next({ status: 500, message: 'SOmething went wrong' });
+    next({ status: 500, message: 'Something went wrong' });
   }
 };
 
