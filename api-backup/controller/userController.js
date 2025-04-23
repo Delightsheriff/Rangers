@@ -21,7 +21,12 @@ const register = async (req, res, next) => {
     });
 
     await newUser.save();
-    res.status(201).json(newUser);
+
+    // Return only the user ID and a success message
+    res.status(201).json({
+      message: 'User registered successfully',
+      userId: newUser._id,
+    });
   } catch (error) {
     next({ status: 500, message: 'Something went wrong' });
   }
