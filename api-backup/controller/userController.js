@@ -53,7 +53,6 @@ const login = async (req, res, next) => {
       return res.status(400).json({ msg: 'email address or password incorrect' });
     }
 
-    const { password: _, ...userData } = user.toObject();
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
@@ -64,11 +63,23 @@ const login = async (req, res, next) => {
     // Send login notification email
     await sendEmail(email, 'login', user.firstName);
 
+    // Create a clean user object without sensitive data
+    const userResponse = {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+
     res.status(200).json({
-      msg: 'User logged in',
-      user: userData,
-      accessToken,
-      refreshToken,
+      success: true,
+      data: {
+        user: userResponse,
+        tokens: {
+          accessToken,
+          refreshToken,
+        },
+      },
     });
   } catch (error) {
     next({ status: 500, message: 'Something went wrong' });
@@ -233,6 +244,39 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Find user with valid reset token
+    const user = await userModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update user's password and clear reset token fields
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    // Send confirmation email
+    await sendEmail(user.email, 'passwordChanged', user.firstName);
+
+    res.status(200).json({ message: 'Password has been reset successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -242,4 +286,5 @@ module.exports = {
   update_a_user,
   delete_a_user,
   forgotPassword,
+  resetPassword,
 };
