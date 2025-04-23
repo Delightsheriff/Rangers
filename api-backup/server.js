@@ -1,21 +1,18 @@
-const express = require('express')
-const connectDb = require('./db/dbController')
+const express = require('express');
+const connectDb = require('./db/dbController');
 const userRouter = require('./router/userRouter');
-const app = express()
+const app = express();
 const err = require('./middleware/errorHandler');
-const cookieParser = require('cookie-parser');
-require("dotenv").config()
-const port = process.env.PORT
+require('dotenv').config();
+const port = process.env.PORT;
 
-connectDb()
+connectDb();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // routes
 app.use('/api', userRouter);
-
 
 app.use(err);
 
