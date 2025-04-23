@@ -1,5 +1,7 @@
-import { DataTypes } from 'sequelize';
 import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import { BelongsToMany } from 'sequelize-typescript';
+import { GroupEntity } from './group.entity';
+import { GroupMemberEntity } from './group-member.entity';
 
 export enum Gender {
   MALE = 'male',
@@ -10,11 +12,11 @@ export enum Gender {
 @Table({ tableName: 'users', timestamps: true, underscored: true })
 export class UserEntity extends Model {
   @Column({
-    type: DataTypes.UUIDV4,
+    type: DataType.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   })
-  id: string;
+  id: number;
 
   @Column({
     type: DataType.STRING,
@@ -73,4 +75,7 @@ export class UserEntity extends Model {
     field: 'gender',
   })
   gender: Gender;
+
+  @BelongsToMany(() => GroupEntity, () => GroupMemberEntity)
+  groups: GroupEntity[];
 }
