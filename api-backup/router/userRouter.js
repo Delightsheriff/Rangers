@@ -2,16 +2,6 @@
 const { Router } = require('express');
 
 // Import controller functions for user authentication and management
-const {
-  register,
-  login,
-  logout,
-  refreshToken,
-  update_a_user,
-  get_a_user,
-  forgotPassword,
-  resetPassword,
-} = require('../controller/userController');
 
 // Import rate limiter for auth routes
 const { authLimiter } = require('../middleware/rateLimiter');
@@ -21,6 +11,16 @@ const { validateRequest, schemas } = require('../middleware/validator');
 
 // Import auth middleware
 const authMiddleware = require('../middleware/authMiddleware');
+const {
+  register,
+  login,
+  refreshToken,
+  logout,
+  resetPassword,
+  forgotPassword,
+  getUser,
+  updateUser,
+} = require('../controller/userController');
 
 // Create a new router instance
 const authRouter = Router()
@@ -37,10 +37,10 @@ const authRouter = Router()
   .post('/auth/refresh-token', authLimiter, validateRequest(schemas.refreshToken), refreshToken)
 
   // Route to update a user's information by ID
-  .put('/auth/update/:id', authMiddleware, validateRequest(schemas.updateUser), update_a_user)
+  .put('/auth/update/:id', authMiddleware, validateRequest(schemas.updateUser), updateUser)
 
   // Route to retrieve a single user's information by ID
-  .get('/auth/user/:id', authMiddleware, get_a_user)
+  .get('/auth/user/:id', authMiddleware, getUser)
 
   // Route to handle forgot password
   .post(

@@ -1,39 +1,61 @@
+// MODEL (userModel.js)
+
 const mongoose = require('mongoose');
 
-const userModel = new mongoose.Schema(
+const RefreshTokenSchema = new mongoose.Schema({
+  token: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now, expires: '7d' },
+});
+
+const UserSchema = new mongoose.Schema(
   {
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
+    firstName: { type: String, required: true, trim: true, minlength: 2 },
+    lastName: { type: String, required: true, trim: true, minlength: 2 },
     email: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Invalid email'],
     },
-    password: {
-      type: String,
-      required: true,
-    },
-    refreshTokens: [
-      {
-        token: String,
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+    password: { type: String, required: true, minlength: 6 },
+    refreshTokens: [RefreshTokenSchema],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    isVerified: { type: Boolean, default: false },
+    verificationToken: String,
+    verificationTokenExpires: Date,
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
 
-module.exports = mongoose.model('user', userModel);
+UserSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  delete obj.refreshTokens;
+  delete obj.resetPasswordToken;
+  delete obj.resetPasswordExpires;
+  delete obj.verificationToken;
+  delete obj.verificationTokenExpires;
+  delete obj.__v;
+  return obj;
+};
+
+UserSchema.methods.cleanupRefreshTokens = async function () {
+  const now = Date.now();
+  this.refreshTokens = this.refreshTokens
+    .filter((t) => t.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000 > now)
+    .slice(-5);
+  return this.save();
+};
+
+const UserModel = mongoose.model('User', UserSchema);
+
+module.exports = {
+  UserModel,
+};
