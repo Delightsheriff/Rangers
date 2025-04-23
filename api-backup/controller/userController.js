@@ -2,6 +2,8 @@ const { generateAccessToken, generateRefreshToken } = require('../jwt/tokengener
 const userModel = require('../model/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { sendEmail } = require('../utils/emailHelper');
 
 const register = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
@@ -21,6 +23,9 @@ const register = async (req, res, next) => {
     });
 
     await newUser.save();
+
+    // Send welcome email
+    await sendEmail(email, 'welcome', firstName);
 
     // Return only the user ID and a success message
     res.status(201).json({
@@ -55,6 +60,9 @@ const login = async (req, res, next) => {
     // Store refresh token in database
     user.refreshTokens.push({ token: refreshToken });
     await user.save();
+
+    // Send login notification email
+    await sendEmail(email, 'login', user.firstName);
 
     res.status(200).json({
       msg: 'User logged in',
@@ -145,16 +153,37 @@ const update_a_user = async (req, res, next) => {
   }
 
   try {
+    // Check if email is being updated
+    if (update.email && update.email !== userInfo.email) {
+      // Check if the new email already exists
+      const existingUser = await userModel.findOne({ email: update.email });
+      if (existingUser && existingUser._id.toString() !== id) {
+        return res.status(400).json({ msg: 'Email already in use' });
+      }
+    }
+
+    // If password is being updated, hash it
+    if (update.password) {
+      const salt = await bcrypt.genSalt(10);
+      update.password = await bcrypt.hash(update.password, salt);
+    }
+
     const updatedUserDetails = await userModel.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,
     });
+
     if (!updatedUserDetails) {
       return res.status(404).json({ msg: 'No user found' });
     }
+
     const { password: _, ...userData } = updatedUserDetails.toObject();
     res.status(200).json(userData);
   } catch (error) {
+    console.error('Update error:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ msg: error.message });
+    }
     next(error);
   }
 };
@@ -175,6 +204,35 @@ const delete_a_user = async (req, res, next) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+    await user.save();
+
+    // Create reset link
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    // Send password reset email
+    await sendEmail(email, 'passwordReset', resetLink);
+
+    res.status(200).json({ message: 'Password reset email sent' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Error sending password reset email' });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -183,4 +241,5 @@ module.exports = {
   get_a_user,
   update_a_user,
   delete_a_user,
+  forgotPassword,
 };
