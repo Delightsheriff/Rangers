@@ -10,41 +10,43 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
 import { signUp } from '@/lib/action';
 import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { cn } from '@/lib/utils';
+
+const signUpSchema = z.object({
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+    ),
+});
+
+type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export default function SignUpForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+  });
 
-    if (!firstName || !lastName || !email || !password) {
-      setError('Please fill in all fields');
-      return;
-    }
-
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
-      return;
-    }
-
+  const onSubmit = async (data: SignUpFormData) => {
     setIsLoading(true);
 
-    const signData = {
-      firstName,
-      lastName,
-      email,
-      password,
-    };
-
-    const result = await signUp(signData);
+    const result = await signUp(data);
 
     setIsLoading(false);
 
@@ -52,8 +54,7 @@ export default function SignUpForm() {
       toast.success('Sign up successful!');
       router.push('/auth/login');
     } else {
-      // Display the error from the server
-      setError(result.error || 'Sign up failed. Please try again.');
+      toast.error(result.error || 'Sign up failed. Please try again.');
     }
   };
 
@@ -64,7 +65,7 @@ export default function SignUpForm() {
   return (
     <div className="w-full">
       <Card>
-        <form onSubmit={handleSignup}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="pt-4">
             <div className="grid gap-4">
               <div className="grid gap-2">
@@ -73,10 +74,12 @@ export default function SignUpForm() {
                   id="firstName"
                   type="text"
                   placeholder="John"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
+                  {...register('firstName')}
+                  className={cn(errors.firstName && 'border-destructive')}
                 />
+                {errors.firstName && (
+                  <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="lastName">Last Name</Label>
@@ -84,10 +87,12 @@ export default function SignUpForm() {
                   id="lastName"
                   type="text"
                   placeholder="Doe"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
+                  {...register('lastName')}
+                  className={cn(errors.lastName && 'border-destructive')}
                 />
+                {errors.lastName && (
+                  <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -95,10 +100,10 @@ export default function SignUpForm() {
                   id="email"
                   type="email"
                   placeholder="email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  {...register('email')}
+                  className={cn(errors.email && 'border-destructive')}
                 />
+                {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
@@ -107,9 +112,8 @@ export default function SignUpForm() {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="********"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
+                    {...register('password')}
+                    className={cn(errors.password && 'border-destructive')}
                   />
                   <button
                     type="button"
@@ -121,11 +125,14 @@ export default function SignUpForm() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
                 <p className="text-xs text-muted-foreground">
-                  Password must be at least 8 characters long
+                  Password must be at least 8 characters long and contain at least one uppercase
+                  letter, one lowercase letter, and one number
                 </p>
               </div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
           </CardContent>
           <CardFooter className="mt-4">
