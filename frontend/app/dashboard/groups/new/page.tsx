@@ -6,7 +6,6 @@ import Link from 'next/link';
 
 export default async function page() {
   const session = await getServerSession();
-  console.log('🚀 ~ session:', session);
   return (
     <main className="flex-1 p-6">
       <div className="mb-6">
