@@ -39,6 +39,46 @@ app.use(apiLimiter); // Apply rate limiting to all routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to $plitwise API',
+    description: 'A smart expense sharing application',
+    version: '1.0.0',
+    documentation: '/api',
+    status: 'Online',
+    serverTime: new Date().toISOString(),
+  });
+});
+
+// API root route
+app.get('/api', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to $plitwise API endpoints',
+    version: '1.0.0',
+    endpoints: {
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        logout: 'POST /api/auth/logout',
+        refreshToken: 'POST /api/auth/refresh-token',
+      },
+      user: {
+        getProfile: 'GET /api/users/:id',
+        updateProfile: 'PUT /api/users/:id',
+        deleteAccount: 'DELETE /api/users/:id',
+      },
+      password: {
+        forgot: 'POST /api/auth/forgot-password',
+        reset: 'POST /api/auth/reset-password',
+      },
+    },
+    serverTime: new Date().toISOString(),
+  });
+});
+
 // Routes
 app.use('/api', userRouter);
 
