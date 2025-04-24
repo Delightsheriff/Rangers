@@ -1,9 +1,10 @@
 import 'package:adc_hackathon/core/apihandler/api_service.dart';
+import 'package:adc_hackathon/core/apihandler/error_response.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
-import '../models/user_model.dart';
+import '../../core/models/user_model.dart';
 
 class AuthDataSource {
   final storage = GetIt.instance<FlutterSecureStorage>();
@@ -30,7 +31,7 @@ class AuthDataSource {
           key: 'auth_token', value: response.data['token'] as String);
       return UserModel.fromJson(response.data['user'] as Map<String, dynamic>);
     } catch (e) {
-      rethrow;
+      throw ApiError.fromDioError(e);
     }
   }
 
@@ -46,9 +47,16 @@ class AuthDataSource {
           'lastName': lName,
         },
       );
+      if (response.data == null) {
+        throw ApiError(
+            errorCode: '400', errorMessage: 'Bad Request. Try Again Later');
+      }
       final data = response.data['user'] as Map<String, dynamic>;
-      await storage.write(key: 'auth_token', value: data['token'] as String);
+      final token = response.data['token'] as String;
+      await storage.write(key: 'auth_token', value: token);
       return UserModel.fromJson(data);
+    } on DioException catch (e) {
+      throw ApiError.fromDioError(e);
     } catch (e) {
       rethrow;
     }
@@ -75,6 +83,10 @@ class AuthDataSource {
           },
         ),
       );
+      if (response.data == null) {
+        throw ApiError(
+            errorCode: '400', errorMessage: 'Bad Request. Try Again Later');
+      }
       if (response.statusCode == 200) {
         return UserModel.fromJson(
             response.data as Map<String, dynamic>); // Token is valid
@@ -82,8 +94,10 @@ class AuthDataSource {
         return null; // Token is invalid or missing from the server
       }
       return null;
+    } on DioException catch (e) {
+      throw ApiError.fromDioError(e);
     } catch (e) {
-      return null; // Handle errors like no network or server down
+      rethrow;
     }
   }
 }

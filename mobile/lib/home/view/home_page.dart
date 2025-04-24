@@ -1,9 +1,11 @@
 import 'package:adc_hackathon/auth/bloc/auth_bloc/auth_bloc.dart';
+import 'package:adc_hackathon/groups/groups.dart';
 import 'package:adc_hackathon/home/bloc/home_bloc.dart';
 import 'package:adc_hackathon/utils/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../config/theme/colors.dart';
 
@@ -37,32 +39,43 @@ class HomeView extends StatelessWidget {
               snap: true,
               backgroundColor: AppColors.background,
               scrolledUnderElevation: 0,
+              titleSpacing: 0,
+              leadingWidth: 30,
+              centerTitle: false,
               title: Row(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: AppColors.surface,
-                    child: Center(
-                      child: Text(
-                        '${(authBloc.state as AuthLoggedInState).user.firstName[0]}${(authBloc.state as AuthLoggedInState).user.lastName[0]}',
+                  SizedBox.square(
+                    dimension: 50,
+                    child: CircleAvatar(
+                      backgroundColor: AppColors.surface,
+                      child: Center(
+                        child: Text(
+                          '${(authBloc.state as AuthLoggedInState).user.firstName[0]}${(authBloc.state as AuthLoggedInState).user.lastName[0]}',
+                        ),
                       ),
                     ),
                   ),
                   8.w,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome Back',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      Text(
-                        '${(authBloc.state as AuthLoggedInState).user.firstName} ${(authBloc.state as AuthLoggedInState).user.lastName}',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome Back',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        Text(
+                          '${(authBloc.state as AuthLoggedInState).user.firstName} ${(authBloc.state as AuthLoggedInState).user.lastName}',
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -96,7 +109,7 @@ class HomeView extends StatelessWidget {
             ),
           ],
         ),
-        floatingActionButton: AddFloatingActionButton(),
+        floatingActionButton: const AddFloatingActionButton(),
       ),
     );
   }
@@ -233,7 +246,9 @@ class AddFloatingActionButton extends StatelessWidget {
             child: const Icon(Icons.money)),
         SpeedDialChild(
             label: 'Create a new Group',
-            onTap: () {},
+            onTap: () {
+              context.go(GroupsPage.routeName);
+            },
             child: const Icon(Icons.people))
       ],
     );
@@ -262,13 +277,16 @@ class GroupsSection extends StatelessWidget {
               ),
               const Spacer(),
               TextButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
+                  onPressed: () {
+                    // Go to Groups Page
+                    context.go(GroupsPage.routeName);
+                  },
+                  style: const ButtonStyle(
                       padding: WidgetStatePropertyAll(
                           EdgeInsets.symmetric(horizontal: 8)),
                       foregroundColor:
                           WidgetStatePropertyAll(AppColors.primary)),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('See All'),
@@ -296,7 +314,7 @@ class GroupsSection extends StatelessWidget {
                           radius: 35,
                         ),
                         Text('Group ${index + 1}'),
-                        Text('100 / 500'),
+                        Text(r'$ 100 / 500'),
                       ],
                     ),
                   ),
