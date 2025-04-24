@@ -51,16 +51,29 @@ const schemas = {
   }),
 
   // User update schema
-  updateUser: z.object({
-    firstName: z.string().min(1, 'First name is required').optional(),
-    lastName: z.string().min(1, 'Last name is required').optional(),
-    email: z.string().email('Invalid email address').optional(),
-    password: z.string().min(6, 'Password must be at least 6 characters').optional(),
-  }),
+  updateUser: z
+    .object({
+      firstName: z.string().min(1, 'First name is required').optional(),
+      lastName: z.string().min(1, 'Last name is required').optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'At least one field (firstName or lastName) must be provided',
+    }),
 
   // Refresh token schema
   refreshToken: z.object({
     refreshToken: z.string().min(1, 'Refresh token is required'),
+  }),
+
+  // Forgot password schema
+  forgotPassword: z.object({
+    email: z.string().email('Invalid email address'),
+  }),
+
+  // Reset password schema
+  resetPassword: z.object({
+    token: z.string().min(1, 'Reset token is required'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
   }),
 };
 
