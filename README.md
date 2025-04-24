@@ -8,11 +8,11 @@ Team Rangers participated in ADC Hackathon 2025 and this concept is to create an
 
 ## About ✍️
 
-## An app where users can log shared expenses (e.g., for roommates, trips, or group outings), and it calculates who owes what amount.
+An app where users can log shared expenses (e.g., for roommates, trips, or group outings), and it calculates who owes what amount.
 
 ## Features 🌠
 
-Here’s what makes Educare stand out:
+Here’s what makes SplitWise stand out:
 
 ### Frontend Features
 
