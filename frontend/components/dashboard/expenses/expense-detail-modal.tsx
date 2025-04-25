@@ -114,7 +114,7 @@ export default function ExpenseDetailModal({
     setTimeout(() => {
       setIsLoading(false);
       onOpenChange(false);
-      toast( 'Payment recorded' );
+      toast('Payment recorded');
     }, 1500);
   };
 
@@ -127,7 +127,9 @@ export default function ExpenseDetailModal({
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-xl">{expense.description}</DialogTitle>
-          <DialogDescription>Added on {formatDate(new Date(expense.date), 'long')}</DialogDescription>
+          <DialogDescription>
+            Added on {formatDate(new Date(expense.date), 'long')}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-6 py-4">

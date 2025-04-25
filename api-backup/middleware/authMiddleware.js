@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const userModel = require('../model/userModel');
+const { UserModel } = require('../model/userModel');
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -9,22 +9,24 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (!verifiedToken) {
-      return res.status(401).json({ msg: 'Invalid token' });
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ message: 'Invalid or expired token' });
     }
 
-    const user = await userModel.findById(verifiedToken.id).select('-password');
+    const user = await UserModel.findById(decoded.id).select('-password');
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
 
     req.user = user;
     next();
-  } catch (error) {
-    console.error(error);
-    res.status(401).json({ message: 'Invalid token' });
+  } catch (err) {
+    console.error('Auth middleware error:', err);
+    res.status(401).json({ message: 'Authentication failed' });
   }
 };
 

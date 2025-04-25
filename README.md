@@ -112,7 +112,7 @@ PORT=3000
 
 - **Next.js with Typescript**: For building the user interface.
 - **Tailwind CSS**: For styling the components.
-- **Next-auth**: For making API calls for authetication and authorisation.
+- **Next-auth**: For making API calls for authentication and authorisation.
 
 ### Backend
 
