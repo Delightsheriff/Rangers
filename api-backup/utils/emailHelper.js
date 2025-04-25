@@ -67,6 +67,32 @@ const emailTemplates = {
             </div>
         `,
   }),
+
+  groupInvitation: (groupName, creatorName, registrationLink) => ({
+    subject: `You've been invited to join ${groupName} on $plitwise!`,
+    html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2>Group Invitation</h2>
+                <p>Hi there!</p>
+                <p><strong>${creatorName}</strong> has invited you to join the group <strong>${groupName}</strong> on $plitwise.</p>
+                <p>With $plitwise, you can easily split expenses with friends and family, track who owes what, and keep your finances organized.</p>
+                <p>Click the button below to create an account and join the group:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${registrationLink}" 
+                       style="background-color: #4CAF50; 
+                              color: white; 
+                              padding: 12px 24px; 
+                              text-decoration: none; 
+                              border-radius: 4px; 
+                              display: inline-block;">
+                        Create Account
+                    </a>
+                </div>
+                <p>Once you create an account, you'll automatically be added to the group.</p>
+                <p>Best regards,<br>The $plitwise Team</p>
+            </div>
+        `,
+  }),
 };
 
 // Create reusable transporter
@@ -84,7 +110,7 @@ const createTransporter = () => {
 const sendEmail = async (to, template, data) => {
   try {
     const transporter = createTransporter();
-    const { subject, html } = emailTemplates[template](data);
+    const { subject, html } = emailTemplates[template](...data);
 
     const mailOptions = {
       from: `"$plitwise" <${process.env.EMAIL_USER}>`,

@@ -1,15 +1,11 @@
 // src/controllers/authController.js
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const {
-  generateAccessToken,
-  generateRefreshToken,
-  createResponse,
-  hashToken,
-} = require('../jwt/tokengenerator');
+const { createResponse } = require('../jwt/tokengenerator');
 const { UserModel } = require('../model/userModel');
 const { sendEmail } = require('../utils/emailHelper');
+const { handleRegistrationInvitations } = require('./groupController');
+const { generateTokens, verifyToken, createFreshToken } = require('../jwt/token');
 
 exports.register = async (req, res, next) => {
   try {
@@ -28,6 +24,9 @@ exports.register = async (req, res, next) => {
 
     await user.save();
 
+    // Check for pending group invitations and add user to those groups
+    const groupsJoined = await handleRegistrationInvitations(user._id, email);
+
     // Send welcome email
     try {
       await sendEmail(email, 'welcome', firstName);
@@ -40,6 +39,7 @@ exports.register = async (req, res, next) => {
       success: true,
       message: 'User registered successfully',
       user: user.toJSON(),
+      groupsJoined: groupsJoined > 0 ? `Added to ${groupsJoined} group(s)` : null,
     });
   } catch (err) {
     next(err);
@@ -65,12 +65,11 @@ exports.login = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const accessToken = generateAccessToken(user._id);
-    const rawRefreshToken = generateRefreshToken();
+    const { accessToken, refreshToken } = generateTokens(user);
 
     // Add new refresh token to array (matching schema)
     user.refreshTokens.push({
-      token: hashToken(rawRefreshToken),
+      token: refreshToken,
       createdAt: new Date(),
     });
 
@@ -92,7 +91,7 @@ exports.login = async (req, res, next) => {
     res.status(200).json(
       createResponse(user, {
         accessToken,
-        refreshToken: rawRefreshToken,
+        refreshToken,
       }),
     );
   } catch (err) {
@@ -103,51 +102,38 @@ exports.login = async (req, res, next) => {
 exports.refreshToken = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
+
     if (!refreshToken) {
       return res.status(400).json({ message: 'Missing token' });
     }
 
-    const hashedToken = hashToken(refreshToken);
+    let decoded;
+    try {
+      decoded = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      return res.status(403).json({ message: 'Invalid or expired token' });
+    }
 
-    // Fix: Update query to use correct field name
-    const user = await UserModel.findOne({
-      'refreshTokens.token': hashedToken,
-    });
-
+    const user = await UserModel.findById(decoded._id);
     if (!user) {
+      return res.status(403).json({ message: 'User not found' });
+    }
+
+    const tokenDoc = user.refreshTokens.find((t) => t.token === refreshToken);
+    if (!tokenDoc) {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
-    // Find the specific token
-    const tokenDoc = user.refreshTokens.find((t) => t.token === hashedToken);
-    if (!tokenDoc) {
-      return res.status(403).json({ message: 'Invalid token' });
-    }
+    // Optional: Rotate refresh token here
 
-    // Check if token is expired (7 days)
-    if (Date.now() - tokenDoc.createdAt.getTime() > 7 * 24 * 60 * 60 * 1000) {
-      // Remove expired token
-      user.refreshTokens = user.refreshTokens.filter((t) => t.token !== hashedToken);
-      await user.save();
-      return res.status(403).json({ message: 'Token expired' });
-    }
-
-    // Generate new tokens
-    const newRefreshToken = generateRefreshToken();
-
-    // Remove old token and add new one
-    user.refreshTokens = user.refreshTokens.filter((t) => t.token !== hashedToken);
-    user.refreshTokens.push({
-      token: hashToken(newRefreshToken),
-      createdAt: new Date(),
-    });
-
-    await user.save();
+    const newAccessToken = createFreshToken(user);
 
     res.status(200).json({
-      accessToken: generateAccessToken(user._id),
-      refreshToken: newRefreshToken,
+      accessToken: newAccessToken,
+      message: 'Token refresh successful',
     });
+
+    await user.cleanupRefreshTokens();
   } catch (err) {
     next(err);
   }

@@ -34,7 +34,7 @@ const authRouter = Router()
   .post('/auth/logout', authMiddleware, logout)
 
   // Route to refresh access token
-  .post('/auth/refresh-token', authLimiter, validateRequest(schemas.refreshToken), refreshToken)
+  .post('/auth/refresh-token', validateRequest(schemas.refreshToken), refreshToken)
 
   // Route to update a user's information by ID
   .put('/auth/update/:id', authMiddleware, validateRequest(schemas.updateUser), updateUser)
