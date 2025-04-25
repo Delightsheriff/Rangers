@@ -15,5 +15,15 @@
     }
   ],
   "useGitignore": true,
+<<<<<<< HEAD
   "words": ["Contador", "localizable", "mostrado", "página", "Texto"]
+=======
+  "words": [
+    "Contador",
+    "localizable",
+    "mostrado",
+    "página",
+    "Texto"
+  ]
+>>>>>>> 95bf54f0bd8507e087e2f62e0892cc114b225ac7
 }
