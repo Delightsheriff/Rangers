@@ -1,6 +1,7 @@
 const express = require('express');
 const connectDb = require('./db/dbController');
 const userRouter = require('./router/userRouter');
+const groupRouter = require('./router/groupRouter');
 const app = express();
 const err = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
@@ -74,6 +75,11 @@ app.get('/api', (req, res) => {
         forgot: 'POST /api/auth/forgot-password',
         reset: 'POST /api/auth/reset-password',
       },
+      groups: {
+        create: 'POST /api/groups',
+        getOne: 'GET /api/groups/:groupId',
+        getAll: 'GET /api/groups',
+      },
     },
     serverTime: new Date().toISOString(),
   });
@@ -81,6 +87,7 @@ app.get('/api', (req, res) => {
 
 // Routes
 app.use('/api', userRouter);
+app.use('/api', groupRouter);
 
 // Error handling middleware
 app.use(err);

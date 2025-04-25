@@ -10,6 +10,7 @@ const {
 } = require('../jwt/tokengenerator');
 const { UserModel } = require('../model/userModel');
 const { sendEmail } = require('../utils/emailHelper');
+const { handleRegistrationInvitations } = require('./groupController');
 
 exports.register = async (req, res, next) => {
   try {
@@ -28,6 +29,9 @@ exports.register = async (req, res, next) => {
 
     await user.save();
 
+    // Check for pending group invitations and add user to those groups
+    const groupsJoined = await handleRegistrationInvitations(user._id, email);
+
     // Send welcome email
     try {
       await sendEmail(email, 'welcome', firstName);
@@ -40,6 +44,7 @@ exports.register = async (req, res, next) => {
       success: true,
       message: 'User registered successfully',
       user: user.toJSON(),
+      groupsJoined: groupsJoined > 0 ? `Added to ${groupsJoined} group(s)` : null,
     });
   } catch (err) {
     next(err);
