@@ -263,7 +263,7 @@ export default function GroupsPageContent({ groups }: groupsProps) {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link href={`/groups/${group.id}`}>
+                        <Link href={`/dashboard/groups/${group.id}`}>
                           <Button variant="outline" size="sm" className="gap-1">
                             View
                             <ArrowRight className="h-3 w-3" />

@@ -355,3 +355,82 @@ export async function deleteGroup(groupId: string): Promise<DeleteGroupResult> {
     };
   }
 }
+
+export type GroupMember = {
+  id: string | null;
+  name: string | null;
+  email: string;
+  isActive: boolean;
+  joinedAt: string;
+};
+
+export type GroupInvite = {
+  email: string;
+  invitedAt: string;
+};
+
+export type GroupDetails = {
+  id: string;
+  name: string;
+  description: string;
+  creator: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  members: GroupMember[];
+  invitedUsers: GroupInvite[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type GetGroupDetailsResult = {
+  success: boolean;
+  data?: {
+    group: GroupDetails;
+  };
+  error?: string;
+};
+
+export async function getGroupDetails(groupId: string): Promise<GetGroupDetailsResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to view group details',
+      };
+    }
+
+    const response = await fetch(`${URL}/groups/${groupId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to fetch group details',
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        group: result.group,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching group details:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch group details. Please try again later.',
+    };
+  }
+}
