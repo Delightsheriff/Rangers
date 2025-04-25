@@ -65,7 +65,7 @@ export class AuthService {
         username: user.username,
         phone: user.phone,
         gender: user.gender,
-        email: user.email
+        email: user.email,
       },
       token,
     };
