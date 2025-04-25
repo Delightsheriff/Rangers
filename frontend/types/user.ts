@@ -6,12 +6,13 @@ export interface CustomSession extends Session {
   accessToken?: string;
   refreshToken?: string;
   error?: string;
+  accessTokenExpires?: number;
 }
 
 export interface Token extends JWT {
-  user?: User;
-  accessToken?: string;
-  refreshToken?: string;
+  user: User;
+  accessToken: string;
+  refreshToken: string;
   error?: string;
-  expiresAt?: number;
+  accessTokenExpires: number;
 }

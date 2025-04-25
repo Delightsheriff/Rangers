@@ -1,25 +1,8 @@
 'use client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import type { Group } from '@/interface/group';
-import { cn } from '@/lib/utils';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { toast } from 'sonner';
 import {
   ArrowRight,
   FileText,
@@ -29,9 +12,27 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react';
-import Link from 'next/link';
-import { useState } from 'react';
-import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -40,7 +41,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+
+import type { Group } from '@/interface/group';
+import { cn } from '@/lib/utils';
 
 interface groupsProps {
   groups: Group[];
@@ -48,67 +51,56 @@ interface groupsProps {
 
 export default function GroupsPageContent({ groups }: groupsProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [inviteModalOpen, setInviteModalOpen] = useState(false);
-  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
+  const [modalType, setModalType] = useState<'invite' | 'leave' | 'delete' | null>(null);
 
-  const filteredGroups = groups.filter((group) => {
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        group.name.toLowerCase().includes(query) || group.description.toLowerCase().includes(query)
-      );
-    }
-    return true;
-  });
+  const filteredGroups = groups.filter((group) =>
+    searchQuery
+      ? group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        group.description.toLowerCase().includes(searchQuery.toLowerCase())
+      : true,
+  );
 
-  const handleLeaveGroup = (groupId: string) => {
+  const closeModal = () => {
+    setModalType(null);
+    setSelectedGroupId(null);
+    setInviteEmail('');
+  };
+
+  const openModal = (type: 'invite' | 'leave' | 'delete', groupId: string) => {
+    setModalType(type);
     setSelectedGroupId(groupId);
-    setLeaveModalOpen(true);
-  };
-
-  const confirmLeaveGroup = () => {
-    if (selectedGroupId) {
-      console.log('Leaving group:', selectedGroupId);
-      toast.info('This feature is coming soon.');
-      setLeaveModalOpen(false);
-    }
-  };
-
-  const handleDeleteGroup = (groupId: string) => {
-    setSelectedGroupId(groupId);
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDeleteGroup = () => {
-    if (selectedGroupId) {
-      console.log('Deleting group:', selectedGroupId);
-      toast.info('This feature is coming soon.');
-      setDeleteModalOpen(false);
-    }
-  };
-
-  const handleInviteMember = (groupId: string) => {
-    setSelectedGroupId(groupId);
-    setInviteModalOpen(true);
   };
 
   const submitInvite = () => {
     if (selectedGroupId && inviteEmail) {
       console.log('Inviting to group:', selectedGroupId, 'Email:', inviteEmail);
       toast.success(`Invitation sent to ${inviteEmail}`);
-      setInviteModalOpen(false);
-      setInviteEmail('');
+      closeModal();
     } else {
       toast.error('Please enter a valid email address');
     }
   };
 
+  const confirmLeaveGroup = () => {
+    if (selectedGroupId) {
+      console.log('Leaving group:', selectedGroupId);
+      toast.info('This feature is coming soon.');
+      closeModal();
+    }
+  };
+
+  const confirmDeleteGroup = () => {
+    if (selectedGroupId) {
+      console.log('Deleting group:', selectedGroupId);
+      toast.info('This feature is coming soon.');
+      closeModal();
+    }
+  };
+
   return (
     <section className="w-full">
-      {/* Search Bar */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -143,7 +135,6 @@ export default function GroupsPageContent({ groups }: groupsProps) {
             </div>
           ) : (
             <Table>
-              {/* <TableHeader className="hidden md:table-header-group"> */}
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
@@ -216,50 +207,21 @@ export default function GroupsPageContent({ groups }: groupsProps) {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleInviteMember(group.id)}>
+                            <DropdownMenuItem onClick={() => openModal('invite', group.id)}>
                               <UserPlus className="mr-2 h-4 w-4" />
                               Invite Members
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="text-destructive focus:text-destructive"
-                              onClick={() => handleLeaveGroup(group.id)}
+                              onClick={() => openModal('leave', group.id)}
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="mr-2 h-4 w-4"
-                              >
-                                <path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2" />
-                                <path d="M7 12h14l-3-3m0 6 3-3" />
-                              </svg>
                               Leave Group
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive focus:text-destructive"
-                              onClick={() => handleDeleteGroup(group.id)}
+                              onClick={() => openModal('delete', group.id)}
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="mr-2 h-4 w-4"
-                              >
-                                <path d="M3 6h18" />
-                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                                <line x1="10" x2="10" y1="11" y2="17" />
-                                <line x1="14" x2="14" y1="11" y2="17" />
-                              </svg>
                               Delete Group
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -274,8 +236,7 @@ export default function GroupsPageContent({ groups }: groupsProps) {
         </CardContent>
       </Card>
 
-      {/* Footer */}
-      <div className="mt-8 grid gap-6 md:grid-cols-2 ">
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
         <Card>
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center">
@@ -305,9 +266,7 @@ export default function GroupsPageContent({ groups }: groupsProps) {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => {
-                  toast.info('This feature is coming soon.');
-                }}
+                onClick={() => toast.info('This feature is coming soon.')}
               >
                 Join Group
               </Button>
@@ -315,14 +274,13 @@ export default function GroupsPageContent({ groups }: groupsProps) {
           </CardContent>
         </Card>
       </div>
+
       {/* Invite Member Modal */}
-      <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
+      <Dialog open={modalType === 'invite'} onOpenChange={(open) => (open ? null : closeModal())}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Invite Member</DialogTitle>
-            <DialogDescription>
-              Enter the email address of the person you want to invite to this group.
-            </DialogDescription>
+            <DialogDescription>Enter the email of the person to invite.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -337,7 +295,7 @@ export default function GroupsPageContent({ groups }: groupsProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setInviteModalOpen(false)}>
+            <Button variant="outline" onClick={closeModal}>
               Cancel
             </Button>
             <Button onClick={submitInvite}>Send Invitation</Button>
@@ -345,18 +303,17 @@ export default function GroupsPageContent({ groups }: groupsProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Leave Group Confirmation Modal */}
-      <Dialog open={leaveModalOpen} onOpenChange={setLeaveModalOpen}>
+      {/* Leave Group Modal */}
+      <Dialog open={modalType === 'leave'} onOpenChange={(open) => (open ? null : closeModal())}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Leave Group</DialogTitle>
             <DialogDescription>
-              Are you sure you want to leave this group? You will no longer have access to the
-              group&apos;s expenses.
+              Are you sure you want to leave this group? You will lose access to its data.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setLeaveModalOpen(false)}>
+            <Button variant="outline" onClick={closeModal}>
               Cancel
             </Button>
             <Button variant="destructive" onClick={confirmLeaveGroup}>
@@ -366,18 +323,17 @@ export default function GroupsPageContent({ groups }: groupsProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Group Confirmation Modal */}
-      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+      {/* Delete Group Modal */}
+      <Dialog open={modalType === 'delete'} onOpenChange={(open) => (open ? null : closeModal())}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Group</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this group? This action cannot be undone and all
-              expense data will be permanently lost.
+              This action is irreversible. All group data will be permanently deleted.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+            <Button variant="outline" onClick={closeModal}>
               Cancel
             </Button>
             <Button variant="destructive" onClick={confirmDeleteGroup}>
