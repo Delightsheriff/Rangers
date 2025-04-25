@@ -1,6 +1,7 @@
 'use server';
 
 import { getServerSession } from 'next-auth';
+import { revalidatePath } from 'next/cache';
 import { authOptions } from './auth';
 import { Group as GroupInterface } from '@/interface/group';
 
@@ -200,6 +201,157 @@ export async function getUserGroups(): Promise<GetUserGroupsResult> {
     return {
       success: false,
       error: 'Failed to fetch groups. Please try again later.',
+    };
+  }
+}
+
+export type AddMemberResult = {
+  success: boolean;
+  message?: string;
+  error?: string;
+};
+
+export async function addMemberToGroup(groupId: string, email: string): Promise<AddMemberResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to add members to a group',
+      };
+    }
+
+    const response = await fetch(`${URL}/groups/${groupId}/members`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to add member to group',
+      };
+    }
+
+    // Revalidate the groups page to refresh the data
+    revalidatePath('/dashboard/groups');
+
+    return {
+      success: true,
+      message: result.message,
+    };
+  } catch (error) {
+    console.error('Error adding member to group:', error);
+    return {
+      success: false,
+      error: 'Failed to add member to group. Please try again later.',
+    };
+  }
+}
+
+export type LeaveGroupResult = {
+  success: boolean;
+  message?: string;
+  error?: string;
+};
+
+export async function leaveGroup(groupId: string): Promise<LeaveGroupResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to leave a group',
+      };
+    }
+
+    const response = await fetch(`${URL}/groups/${groupId}/leave`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to leave group',
+      };
+    }
+
+    // Revalidate the groups page to refresh the data
+    revalidatePath('/dashboard/groups');
+
+    return {
+      success: true,
+      message: result.message,
+    };
+  } catch (error) {
+    console.error('Error leaving group:', error);
+    return {
+      success: false,
+      error: 'Failed to leave group. Please try again later.',
+    };
+  }
+}
+
+export type DeleteGroupResult = {
+  success: boolean;
+  message?: string;
+  error?: string;
+};
+
+export async function deleteGroup(groupId: string): Promise<DeleteGroupResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to delete a group',
+      };
+    }
+
+    const response = await fetch(`${URL}/groups/${groupId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to delete group',
+      };
+    }
+
+    // Revalidate the groups page to refresh the data
+    revalidatePath('/dashboard/groups');
+
+    return {
+      success: true,
+      message: result.message,
+    };
+  } catch (error) {
+    console.error('Error deleting group:', error);
+    return {
+      success: false,
+      error: 'Failed to delete group. Please try again later.',
     };
   }
 }

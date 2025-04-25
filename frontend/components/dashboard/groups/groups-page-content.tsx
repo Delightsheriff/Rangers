@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   ArrowRight,
@@ -12,7 +13,6 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -44,17 +44,19 @@ import {
 
 import type { Group } from '@/interface/group';
 import { cn } from '@/lib/utils';
+import { addMemberToGroup, deleteGroup, leaveGroup } from '@/lib/action';
 
 interface groupsProps {
   groups: Group[];
 }
 
 export default function GroupsPageContent({ groups }: groupsProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
   const [modalType, setModalType] = useState<'invite' | 'leave' | 'delete' | null>(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   const filteredGroups = groups.filter((group) =>
     searchQuery
       ? group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -62,40 +64,109 @@ export default function GroupsPageContent({ groups }: groupsProps) {
       : true,
   );
 
+  // Reset modal state when component unmounts
+  useEffect(() => {
+    return () => {
+      setModalType(null);
+      setSelectedGroupId(null);
+      setInviteEmail('');
+      setIsLoading(false);
+    };
+  }, []);
+
   const closeModal = () => {
-    setModalType(null);
-    setSelectedGroupId(null);
-    setInviteEmail('');
+    // Add a small delay to ensure state is properly reset
+    setTimeout(() => {
+      setModalType(null);
+      setSelectedGroupId(null);
+      setInviteEmail('');
+      setIsLoading(false);
+    }, 100);
   };
 
   const openModal = (type: 'invite' | 'leave' | 'delete', groupId: string) => {
-    setModalType(type);
-    setSelectedGroupId(groupId);
+    // Ensure any previous state is cleared before opening a new modal
+    setModalType(null);
+    setSelectedGroupId(null);
+    setInviteEmail('');
+    setIsLoading(false);
+
+    // Small delay before opening the new modal
+    setTimeout(() => {
+      setModalType(type);
+      setSelectedGroupId(groupId);
+    }, 50);
   };
 
-  const submitInvite = () => {
+  const submitInvite = async () => {
     if (selectedGroupId && inviteEmail) {
-      console.log('Inviting to group:', selectedGroupId, 'Email:', inviteEmail);
-      toast.success(`Invitation sent to ${inviteEmail}`);
-      closeModal();
+      setIsLoading(true);
+      try {
+        const result = await addMemberToGroup(selectedGroupId, inviteEmail);
+        if (result.success) {
+          toast.success(result.message || `Invitation sent to ${inviteEmail}`);
+          // Refresh the data using Next.js router
+          router.refresh();
+        } else {
+          toast.error(result.error || 'Failed to send invitation');
+        }
+      } catch (err) {
+        console.error('Error sending invitation:', err);
+        toast.error('An error occurred while sending the invitation');
+      } finally {
+        // Ensure loading state is reset before closing modal
+        setIsLoading(false);
+        closeModal();
+      }
     } else {
       toast.error('Please enter a valid email address');
-    }
-  };
-
-  const confirmLeaveGroup = () => {
-    if (selectedGroupId) {
-      console.log('Leaving group:', selectedGroupId);
-      toast.info('This feature is coming soon.');
       closeModal();
     }
   };
 
-  const confirmDeleteGroup = () => {
+  const confirmLeaveGroup = async () => {
     if (selectedGroupId) {
-      console.log('Deleting group:', selectedGroupId);
-      toast.info('This feature is coming soon.');
-      closeModal();
+      setIsLoading(true);
+      try {
+        const result = await leaveGroup(selectedGroupId);
+        if (result.success) {
+          toast.success(result.message || 'Successfully left the group');
+          // Refresh the data using Next.js router
+          router.refresh();
+        } else {
+          toast.error(result.error || 'Failed to leave the group');
+        }
+      } catch (err) {
+        console.error('Error leaving group:', err);
+        toast.error('An error occurred while leaving the group');
+      } finally {
+        // Ensure loading state is reset before closing modal
+        setIsLoading(false);
+        closeModal();
+      }
+    }
+  };
+
+  const confirmDeleteGroup = async () => {
+    if (selectedGroupId) {
+      setIsLoading(true);
+      try {
+        const result = await deleteGroup(selectedGroupId);
+        if (result.success) {
+          toast.success(result.message || 'Group deleted successfully');
+          // Refresh the data using Next.js router
+          router.refresh();
+        } else {
+          toast.error(result.error || 'Failed to delete the group');
+        }
+      } catch (err) {
+        console.error('Error deleting group:', err);
+        toast.error('An error occurred while deleting the group');
+      } finally {
+        // Ensure loading state is reset before closing modal
+        setIsLoading(false);
+        closeModal();
+      }
     }
   };
 
@@ -276,7 +347,12 @@ export default function GroupsPageContent({ groups }: groupsProps) {
       </div>
 
       {/* Invite Member Modal */}
-      <Dialog open={modalType === 'invite'} onOpenChange={(open) => (open ? null : closeModal())}>
+      <Dialog
+        open={modalType === 'invite'}
+        onOpenChange={(open) => {
+          if (!open) closeModal();
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Invite Member</DialogTitle>
@@ -291,20 +367,28 @@ export default function GroupsPageContent({ groups }: groupsProps) {
                 placeholder="example@email.com"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={closeModal}>
+            <Button variant="outline" onClick={closeModal} disabled={isLoading}>
               Cancel
             </Button>
-            <Button onClick={submitInvite}>Send Invitation</Button>
+            <Button onClick={submitInvite} disabled={isLoading}>
+              {isLoading ? 'Sending...' : 'Send Invitation'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Leave Group Modal */}
-      <Dialog open={modalType === 'leave'} onOpenChange={(open) => (open ? null : closeModal())}>
+      <Dialog
+        open={modalType === 'leave'}
+        onOpenChange={(open) => {
+          if (!open) closeModal();
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Leave Group</DialogTitle>
@@ -313,18 +397,23 @@ export default function GroupsPageContent({ groups }: groupsProps) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={closeModal}>
+            <Button variant="outline" onClick={closeModal} disabled={isLoading}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={confirmLeaveGroup}>
-              Leave Group
+            <Button variant="destructive" onClick={confirmLeaveGroup} disabled={isLoading}>
+              {isLoading ? 'Leaving...' : 'Leave Group'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Delete Group Modal */}
-      <Dialog open={modalType === 'delete'} onOpenChange={(open) => (open ? null : closeModal())}>
+      <Dialog
+        open={modalType === 'delete'}
+        onOpenChange={(open) => {
+          if (!open) closeModal();
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Group</DialogTitle>
@@ -333,11 +422,11 @@ export default function GroupsPageContent({ groups }: groupsProps) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={closeModal}>
+            <Button variant="outline" onClick={closeModal} disabled={isLoading}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={confirmDeleteGroup}>
-              Delete Group
+            <Button variant="destructive" onClick={confirmDeleteGroup} disabled={isLoading}>
+              {isLoading ? 'Deleting...' : 'Delete Group'}
             </Button>
           </DialogFooter>
         </DialogContent>
