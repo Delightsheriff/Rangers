@@ -3,7 +3,8 @@
 import * as React from 'react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from 'lucide-react';
-
+import { DialogTitle } from '@radix-ui/react-dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { cn } from '@/lib/utils';
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
@@ -49,6 +50,9 @@ function SheetContent({
   return (
     <SheetPortal>
       <SheetOverlay />
+      <VisuallyHidden>
+        <DialogTitle>Your Dialog Title</DialogTitle>
+      </VisuallyHidden>
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
