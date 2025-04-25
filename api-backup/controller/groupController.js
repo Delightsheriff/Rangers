@@ -71,7 +71,7 @@ exports.createGroup = async (req, res, next) => {
 
         // Send invitation email
         try {
-          const registrationLink = `${process.env.FRONTEND_URL}/auth/register`;
+          const registrationLink = `${process.env.FRONTEND_URL}/auth/signup`;
           await sendEmail(member.email, 'groupInvitation', [
             group.name,
             creator.firstName,

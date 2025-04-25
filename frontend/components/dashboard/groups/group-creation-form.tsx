@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, X } from 'lucide-react';
+import { createGroup } from '@/lib/action';
 
 interface creationFormProps {
   creatorEmail: string;
@@ -27,8 +28,15 @@ export default function GroupCreationForm({ creatorEmail }: creationFormProps) {
   const [groupDescription, setGroupDescription] = useState('');
   const [members, setMembers] = useState([{ id: 'member-1', email: creatorEmail, isFixed: true }]);
   const [newMemberEmail, setNewMemberEmail] = useState('');
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (shouldRedirect) {
+      router.push('/dashboard/groups');
+    }
+  }, [shouldRedirect, router]);
 
   const handleAddMember = () => {
     if (!newMemberEmail) return;
@@ -52,7 +60,7 @@ export default function GroupCreationForm({ creatorEmail }: creationFormProps) {
     setMembers(members.filter((m) => m.id !== id));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!groupName) {
       toast.warning('Group name is required');
@@ -65,13 +73,24 @@ export default function GroupCreationForm({ creatorEmail }: creationFormProps) {
       members: members.map((m) => ({ email: m.email })),
     };
 
-    console.log('🚀 Submitting:', submissionData);
     setIsLoading(true);
 
-    setTimeout(() => {
-      toast.success('Group created!');
-      router.push('/dashboard');
-    }, 1500);
+    try {
+      const result = await createGroup(submissionData);
+
+      if (!result.success) {
+        toast.error(result.error || 'Failed to create group');
+        return;
+      }
+
+      toast.success('Group created successfully!');
+      setShouldRedirect(true);
+    } catch (error) {
+      console.error('Error creating group:', error);
+      toast.error('Failed to create group. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -115,7 +134,7 @@ export default function GroupCreationForm({ creatorEmail }: creationFormProps) {
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback>{member.email}</AvatarFallback>
+                        <AvatarFallback>{member.email[0]}</AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium">{member.email}</p>

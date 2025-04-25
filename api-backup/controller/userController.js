@@ -117,6 +117,7 @@ exports.refreshToken = async (req, res, next) => {
     const user = await UserModel.findOne({
       'refreshTokens.token': hashedToken,
     });
+    console.log('user', user);
 
     if (!user) {
       return res.status(403).json({ message: 'Unauthorized' });

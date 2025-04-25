@@ -1,5 +1,8 @@
 'use server';
 
+import { getServerSession } from 'next-auth';
+import { authOptions } from './auth';
+
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
 if (!URL) {
@@ -45,6 +48,76 @@ export async function signUp(signData: {
     return {
       success: false,
       error: 'Sign up failed. Please try again later.',
+    };
+  }
+}
+
+export type CreateGroupResult = {
+  success: boolean;
+  data?: {
+    id: string;
+    name: string;
+    description: string;
+    creator: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    members: Array<{
+      email: string;
+      isActive: boolean;
+    }>;
+    invitedUsers: Array<{
+      email: string;
+      invitedAt: string;
+    }>;
+  };
+  error?: string;
+};
+
+export async function createGroup(groupData: {
+  groupName: string;
+  groupDescription?: string;
+  members: Array<{ email: string }>;
+}): Promise<CreateGroupResult> {
+  try {
+    const session = await getServerSession(authOptions);
+    console.log('Session:', session);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to create a group',
+      };
+    }
+
+    const response = await fetch(`${URL}/groups`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      body: JSON.stringify(groupData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to create group',
+      };
+    }
+
+    return {
+      success: true,
+      data: result.group,
+    };
+  } catch (error) {
+    console.error('Error creating group:', error);
+    return {
+      success: false,
+      error: 'Failed to create group. Please try again later.',
     };
   }
 }

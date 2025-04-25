@@ -13,4 +13,5 @@ export interface Token extends JWT {
   accessToken?: string;
   refreshToken?: string;
   error?: string;
+  expiresAt?: number;
 }

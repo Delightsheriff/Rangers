@@ -110,7 +110,7 @@ const createTransporter = () => {
 const sendEmail = async (to, template, data) => {
   try {
     const transporter = createTransporter();
-    const { subject, html } = emailTemplates[template](data);
+    const { subject, html } = emailTemplates[template](...data);
 
     const mailOptions = {
       from: `"$plitwise" <${process.env.EMAIL_USER}>`,
