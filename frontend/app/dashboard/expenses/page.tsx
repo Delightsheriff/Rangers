@@ -241,77 +241,78 @@ export default function ExpensesPage() {
   };
 
   const handleEditExpense = (expenseId: string) => {
-      toast(`Edit expense with ID: ${expenseId}`);
-    };
+    toast(`Edit expense with ID: ${expenseId}`);
+  };
 
   const handleExportExpenses = () => {
-          toast('Expenses exported');
+    toast('Expenses exported');
   };
 
   return (
     <div>
-        <main className="flex-1 p-6">
-          <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">Expenses</h1>
-              <p className="text-muted-foreground">Manage and track all your expenses</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={handleExportExpenses}>
-                <Download className="h-4 w-4" />
-              </Button>
-              <AddExpenseButton
-                onSuccess={() => {
-                  toast.success("Expense added successfully")
-                }}
-              />
-            </div>
+      <main className="flex-1 p-6">
+        <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Expenses</h1>
+            <p className="text-muted-foreground">Manage and track all your expenses</p>
           </div>
-
-          <div className="mb-6 flex flex-col gap-4 md:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search expenses..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              Filter
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={handleExportExpenses}>
+              <Download className="h-4 w-4" />
             </Button>
+            <AddExpenseButton
+              onSuccess={() => {
+                toast.success('Expense added successfully');
+              }}
+            />
           </div>
+        </div>
 
-          <Tabs
-            defaultValue="all"
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="space-y-4"
-          >
-            <TabsList>
-              <TabsTrigger value="all">All Expenses</TabsTrigger>
-              <TabsTrigger value="paid-by-you">Paid by You</TabsTrigger>
-              <TabsTrigger value="you-owe">You Owe</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="settled">Settled</TabsTrigger>
-            </TabsList>
-            <TabsContent value={activeTab}>
-              <Card>
-                <CardHeader className="flex flex-row items-center">
-                  <CardTitle>
-                    {activeTab === 'all' && 'All Expenses'}
-                    {activeTab === 'paid-by-you' && 'Expenses Paid by You'}
-                    {activeTab === 'you-owe' && 'Expenses You Owe'}
-                    {activeTab === 'pending' && 'Pending Expenses'}
-                    {activeTab === 'settled' && 'Settled Expenses'}
-                  </CardTitle>
-                  <div className="ml-auto text-sm text-muted-foreground">
-                    {filteredExpenses.length} expense{filteredExpenses.length !== 1 ? 's' : ''}
-                  </div>
-                </CardHeader>
-                <CardContent>
+        <div className="mb-6 flex flex-col gap-4 md:flex-row">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search expenses..."
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button variant="outline" className="gap-2">
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+        </div>
+
+        <Tabs
+          defaultValue="all"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4"
+        >
+          <TabsList>
+            <TabsTrigger value="all">All Expenses</TabsTrigger>
+            <TabsTrigger value="paid-by-you">Paid by You</TabsTrigger>
+            <TabsTrigger value="you-owe">You Owe</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsTrigger value="settled">Settled</TabsTrigger>
+          </TabsList>
+          <TabsContent value={activeTab}>
+            <Card>
+              <CardHeader className="flex flex-row items-center">
+                <CardTitle>
+                  {activeTab === 'all' && 'All Expenses'}
+                  {activeTab === 'paid-by-you' && 'Expenses Paid by You'}
+                  {activeTab === 'you-owe' && 'Expenses You Owe'}
+                  {activeTab === 'pending' && 'Pending Expenses'}
+                  {activeTab === 'settled' && 'Settled Expenses'}
+                </CardTitle>
+                <div className="ml-auto text-sm text-muted-foreground">
+                  {filteredExpenses.length} expense{filteredExpenses.length !== 1 ? 's' : ''}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -325,7 +326,7 @@ export default function ExpensesPage() {
                             <ArrowUpDown className="h-3 w-3" />
                           </Button>
                         </TableHead>
-                        <TableHead>
+                        <TableHead className="hidden sm:table-cell">
                           <Button
                             variant="ghost"
                             className="flex items-center gap-1 p-0 font-medium"
@@ -345,8 +346,8 @@ export default function ExpensesPage() {
                             <ArrowUpDown className="h-3 w-3" />
                           </Button>
                         </TableHead>
-                        <TableHead>Paid By</TableHead>
-                        <TableHead>Group</TableHead>
+                        <TableHead className="hidden md:table-cell">Paid By</TableHead>
+                        <TableHead className="hidden lg:table-cell">Group</TableHead>
                         <TableHead>Category</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -376,8 +377,8 @@ export default function ExpensesPage() {
                         </TableRow>
                       ) : (
                         filteredExpenses.map((expense) => (
-                          <TableRow key={expense.id}>
-                            <TableCell className="font-medium">
+                          <TableRow key={expense.id} className="flex flex-col gap-2 sm:table-row">
+                            <TableCell data-label="Description" className="font-medium">
                               <div className="flex items-center gap-2">
                                 {expense.description}
                                 {expense.receipt && (
@@ -385,9 +386,13 @@ export default function ExpensesPage() {
                                 )}
                               </div>
                             </TableCell>
-                            <TableCell>${expense.amount.toFixed(2)}</TableCell>
-                            <TableCell>{formatDate(expense.date, 'medium')}</TableCell>
-                            <TableCell>
+                            <TableCell data-label="Amount" className="hidden sm:table-cell">
+                              ${expense.amount.toFixed(2)}
+                            </TableCell>
+                            <TableCell data-label="Date">
+                              {formatDate(expense.date, 'medium')}
+                            </TableCell>
+                            <TableCell data-label="Paid By" className="hidden md:table-cell">
                               <div className="flex items-center gap-2">
                                 <Avatar className="h-6 w-6">
                                   <AvatarFallback className="text-xs">
@@ -397,11 +402,13 @@ export default function ExpensesPage() {
                                 <span>{expense.paidBy}</span>
                               </div>
                             </TableCell>
-                            <TableCell>{expense.group}</TableCell>
-                            <TableCell>
+                            <TableCell data-label="Group" className="hidden lg:table-cell">
+                              {expense.group}
+                            </TableCell>
+                            <TableCell data-label="Category">
                               <Badge variant="outline">{expense.category}</Badge>
                             </TableCell>
-                            <TableCell>
+                            <TableCell data-label="Status">
                               <Badge
                                 variant={expense.status === 'settled' ? 'secondary' : 'default'}
                                 className={
@@ -413,7 +420,7 @@ export default function ExpensesPage() {
                                 {expense.status === 'settled' ? 'Settled' : 'Pending'}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell data-label="Actions" className="text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -443,12 +450,12 @@ export default function ExpensesPage() {
                       )}
                     </TableBody>
                   </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </main>
-     
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
 
       {selectedExpense && (
         <ExpenseDetailModal
