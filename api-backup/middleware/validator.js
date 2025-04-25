@@ -88,6 +88,11 @@ const schemas = {
       )
       .min(1, 'At least one member is required'),
   }),
+
+  // Add member to group schema
+  addMember: z.object({
+    email: z.string().email('Invalid email address'),
+  }),
 };
 
 module.exports = {

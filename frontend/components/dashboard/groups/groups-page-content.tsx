@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Group } from '@/interface/group';
+import type { Group } from '@/interface/group';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -32,6 +32,15 @@ import {
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 interface groupsProps {
   groups: Group[];
@@ -39,6 +48,11 @@ interface groupsProps {
 
 export default function GroupsPageContent({ groups }: groupsProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState('');
 
   const filteredGroups = groups.filter((group) => {
     if (searchQuery) {
@@ -51,13 +65,45 @@ export default function GroupsPageContent({ groups }: groupsProps) {
   });
 
   const handleLeaveGroup = (groupId: string) => {
-    console.log('Leave group:', groupId);
-    toast.info('This feature is coming soon.');
+    setSelectedGroupId(groupId);
+    setLeaveModalOpen(true);
+  };
+
+  const confirmLeaveGroup = () => {
+    if (selectedGroupId) {
+      console.log('Leaving group:', selectedGroupId);
+      toast.info('This feature is coming soon.');
+      setLeaveModalOpen(false);
+    }
   };
 
   const handleDeleteGroup = (groupId: string) => {
-    console.log('Delete group:', groupId);
-    toast.info('This feature is coming soon.');
+    setSelectedGroupId(groupId);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDeleteGroup = () => {
+    if (selectedGroupId) {
+      console.log('Deleting group:', selectedGroupId);
+      toast.info('This feature is coming soon.');
+      setDeleteModalOpen(false);
+    }
+  };
+
+  const handleInviteMember = (groupId: string) => {
+    setSelectedGroupId(groupId);
+    setInviteModalOpen(true);
+  };
+
+  const submitInvite = () => {
+    if (selectedGroupId && inviteEmail) {
+      console.log('Inviting to group:', selectedGroupId, 'Email:', inviteEmail);
+      toast.success(`Invitation sent to ${inviteEmail}`);
+      setInviteModalOpen(false);
+      setInviteEmail('');
+    } else {
+      toast.error('Please enter a valid email address');
+    }
   };
 
   return (
@@ -142,15 +188,15 @@ export default function GroupsPageContent({ groups }: groupsProps) {
                           group.youOwe > 0
                             ? 'text-red-500'
                             : group.youAreOwed > 0
-                              ? 'text-green-500'
-                              : '',
+                            ? 'text-green-500'
+                            : '',
                         )}
                       >
                         {group.youOwe > 0
                           ? `-$${group.youOwe.toFixed(2)}`
                           : group.youAreOwed > 0
-                            ? `+$${group.youAreOwed.toFixed(2)}`
-                            : '$0.00'}
+                          ? `+$${group.youAreOwed.toFixed(2)}`
+                          : '$0.00'}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -170,33 +216,9 @@ export default function GroupsPageContent({ groups }: groupsProps) {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => {
-                                toast.info('This feature is coming soon.');
-                              }}
-                            >
+                            <DropdownMenuItem onClick={() => handleInviteMember(group.id)}>
                               <UserPlus className="mr-2 h-4 w-4" />
                               Invite Members
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                toast('This feature is coming soon.');
-                              }}
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="mr-2 h-4 w-4"
-                              >
-                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                                <path d="m15 5 4 4" />
-                              </svg>
-                              Edit Group
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -293,6 +315,77 @@ export default function GroupsPageContent({ groups }: groupsProps) {
           </CardContent>
         </Card>
       </div>
+      {/* Invite Member Modal */}
+      <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invite Member</DialogTitle>
+            <DialogDescription>
+              Enter the email address of the person you want to invite to this group.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="example@email.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={submitInvite}>Send Invitation</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Leave Group Confirmation Modal */}
+      <Dialog open={leaveModalOpen} onOpenChange={setLeaveModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Leave Group</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to leave this group? You will no longer have access to the
+              group&apos;s expenses.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLeaveModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmLeaveGroup}>
+              Leave Group
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Group Confirmation Modal */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Group</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this group? This action cannot be undone and all
+              expense data will be permanently lost.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteGroup}>
+              Delete Group
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

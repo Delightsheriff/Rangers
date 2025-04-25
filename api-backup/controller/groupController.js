@@ -234,3 +234,174 @@ exports.handleRegistrationInvitations = async (userId, email) => {
     return 0;
   }
 };
+
+// Add a member to a group
+exports.addMember = async (req, res, next) => {
+  try {
+    const { groupId } = req.params;
+    const { email } = req.body;
+    const userId = req.user._id;
+
+    // Validate input
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required',
+      });
+    }
+
+    // Find the group
+    const group = await GroupModel.findById(groupId);
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: 'Group not found',
+      });
+    }
+
+    // Check if user is a member of the group
+    const isMember = group.isMember(req.user.email);
+    if (!isMember) {
+      return res.status(403).json({
+        success: false,
+        message: 'You are not a member of this group',
+      });
+    }
+
+    // Check if user is already a member
+    if (group.isMember(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'User is already a member of this group',
+      });
+    }
+
+    // Check if user exists
+    const user = await UserModel.findOne({ email });
+
+    if (user) {
+      // User exists, add to members
+      await group.addMember(user._id, user.email);
+      // Add group to user's groups
+      await user.addGroup(group._id);
+    } else {
+      // User doesn't exist, add to invited users
+      await group.inviteUser(email);
+
+      // Send invitation email
+      try {
+        const registrationLink = `${process.env.FRONTEND_URL}/auth/signup`;
+        await sendEmail(email, 'groupInvitation', [
+          group.name,
+          req.user.firstName,
+          registrationLink,
+        ]);
+      } catch (emailError) {
+        console.error('Failed to send invitation email:', emailError);
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: user ? 'Member added successfully' : 'Invitation sent successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Leave a group
+exports.leaveGroup = async (req, res, next) => {
+  try {
+    const { groupId } = req.params;
+    const userId = req.user._id;
+    const userEmail = req.user.email;
+
+    // Find the group
+    const group = await GroupModel.findById(groupId);
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: 'Group not found',
+      });
+    }
+
+    // Check if user is a member of the group
+    const isMember = group.isMember(userEmail);
+    if (!isMember) {
+      return res.status(403).json({
+        success: false,
+        message: 'You are not a member of this group',
+      });
+    }
+
+    // Check if user is the creator
+    if (group.creator.toString() === userId.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Group creator cannot leave the group. Please delete the group instead.',
+      });
+    }
+
+    // Remove member from group
+    await group.removeMember(userEmail);
+
+    // Remove group from user's groups
+    const user = await UserModel.findById(userId);
+    if (user) {
+      await user.removeGroup(groupId);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Successfully left the group',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Delete a group
+exports.deleteGroup = async (req, res, next) => {
+  try {
+    const { groupId } = req.params;
+    const userId = req.user._id;
+
+    // Find the group
+    const group = await GroupModel.findById(groupId);
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: 'Group not found',
+      });
+    }
+
+    // Check if user is the creator
+    if (group.creator.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the group creator can delete the group',
+      });
+    }
+
+    // Remove group from all members' groups
+    for (const member of group.members) {
+      if (member.user) {
+        const user = await UserModel.findById(member.user);
+        if (user) {
+          await user.removeGroup(groupId);
+        }
+      }
+    }
+
+    // Delete the group
+    await GroupModel.findByIdAndDelete(groupId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Group deleted successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
