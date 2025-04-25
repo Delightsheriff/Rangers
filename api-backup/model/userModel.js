@@ -26,6 +26,7 @@ const UserSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     verificationToken: String,
     verificationTokenExpires: Date,
+    groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
   },
   {
     timestamps: true,
@@ -51,6 +52,21 @@ UserSchema.methods.cleanupRefreshTokens = async function () {
   this.refreshTokens = this.refreshTokens
     .filter((t) => t.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000 > now)
     .slice(-5);
+  return this.save();
+};
+
+// Method to add a group to the user's groups
+UserSchema.methods.addGroup = async function (groupId) {
+  if (!this.groups.includes(groupId)) {
+    this.groups.push(groupId);
+    return this.save();
+  }
+  return this;
+};
+
+// Method to remove a group from the user's groups
+UserSchema.methods.removeGroup = async function (groupId) {
+  this.groups = this.groups.filter((id) => id.toString() !== groupId.toString());
   return this.save();
 };
 

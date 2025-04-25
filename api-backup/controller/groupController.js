@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const { GroupModel } = require('../model/groupModel');
 const { UserModel } = require('../model/userModel');
 const { sendEmail } = require('../utils/emailHelper');
@@ -41,6 +40,9 @@ exports.createGroup = async (req, res, next) => {
       ],
     });
 
+    // Add group to creator's groups
+    await creator.addGroup(group._id);
+
     // Process members
     const existingUsers = [];
     const invitedUsers = [];
@@ -58,6 +60,8 @@ exports.createGroup = async (req, res, next) => {
         // User exists, add to members
         existingUsers.push(user);
         await group.addMember(user._id, user.email);
+        // Add group to user's groups
+        await user.addGroup(group._id);
       } else {
         // User doesn't exist, add to invited users
         invitedUsers.push(member.email);
@@ -214,6 +218,14 @@ exports.handleRegistrationInvitations = async (userId, email) => {
     // For each group, add the user as a member
     for (const group of groups) {
       await group.addMember(userId, email);
+    }
+
+    // Get the user and add all groups to their groups array
+    const user = await UserModel.findById(userId);
+    if (user) {
+      for (const group of groups) {
+        await user.addGroup(group._id);
+      }
     }
 
     return groups.length; // Return the number of groups the user was added to
