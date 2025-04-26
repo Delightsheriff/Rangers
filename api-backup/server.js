@@ -41,22 +41,18 @@ app.use(requestLogger); // Custom request logger
 app.use(apiLimiter); // Apply rate limiting to all routes
 
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, "public")));
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Body Parsing Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+
 // Landing page for the api
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
-
 });
-
-
-
 
 // Routes
 app.use('/api', userRouter);
@@ -71,4 +67,4 @@ const swaggerSpec = generateSwaggerSpec(app, {
   description: 'Auto-generated API docs',
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

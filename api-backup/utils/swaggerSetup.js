@@ -5,7 +5,7 @@ function generateSwaggerSpec(app, options = {}) {
     title = 'Auto-generated Swagger Docs',
     version = '1.0.0',
     description = '',
-    servers = [{ url: 'http://localhost:3000' }],
+    servers = [{ url: 'https://react-rangers-7ef561a24383.herokuapp.com/api/' }],
   } = options;
 
   const endpoints = listEndpoints(app);
