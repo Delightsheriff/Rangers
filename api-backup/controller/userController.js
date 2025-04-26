@@ -176,11 +176,6 @@ exports.updateUser = async (req, res, next) => {
         return res.status(400).json({ success: false, message: 'Email already in use' });
     }
 
-    if (update.password) {
-      const salt = await bcrypt.genSalt(10);
-      update.password = await bcrypt.hash(update.password, salt);
-    }
-
     const updated = await UserModel.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,

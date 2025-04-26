@@ -84,7 +84,6 @@ export async function createGroup(groupData: {
 }): Promise<CreateGroupResult> {
   try {
     const session = await getServerSession(authOptions);
-    console.log('Session:', session);
 
     if (!session?.accessToken) {
       return {
