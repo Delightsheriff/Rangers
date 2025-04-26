@@ -1,11 +1,14 @@
 const express = require('express');
+const swaggerUi = require('swagger-ui-express');
 const connectDb = require('./db/dbController');
 const userRouter = require('./router/userRouter');
 const groupRouter = require('./router/groupRouter');
+const expenseRouter = require('./router/expenseRouter');
 const app = express();
 const err = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const requestLogger = require('./middleware/requestLogger');
+const generateSwaggerSpec = require('./utils/swaggerSetup');
 const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -102,3 +105,10 @@ app.use('/api', expenseRouter);
 
 // Error handling middleware
 app.use(err);
+
+const swaggerSpec = generateSwaggerSpec(app, {
+  title: 'SplitWise API',
+  description: 'Auto-generated API docs',
+});
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
