@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { User, Search, ChevronDown, LogOut, Settings, HelpCircle, Menu } from 'lucide-react';
+import { User, Search, ChevronDown, LogOut, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -18,10 +18,21 @@ import { useRouter } from 'next/navigation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import MobileNav from '@/components/dashboard/mobile-nav';
 import { NotificationsDropdown } from './dashboard-notifications';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function DashboardHeader() {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
+
+  const user = session?.user;
+  const userInitials = user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : '';
+  const fullName = user ? `${user.firstName} ${user.lastName}` : '';
+  const userEmail = user?.email || '';
+
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: '/' });
+  };
 
   return (
     <header className="border-b bg-card">
@@ -69,12 +80,12 @@ export default function DashboardHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Alex Johnson" />
-                  <AvatarFallback>AJ</AvatarFallback>
+                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt={fullName} />
+                  <AvatarFallback>{userInitials}</AvatarFallback>
                 </Avatar>
                 <div className="hidden text-left md:block">
-                  <p className="text-sm font-medium">Alex Johnson</p>
-                  <p className="text-xs text-muted-foreground">alex@example.com</p>
+                  <p className="text-sm font-medium">{fullName}</p>
+                  <p className="text-xs text-muted-foreground">{userEmail}</p>
                 </div>
                 <ChevronDown className="h-4 w-4 opacity-50" />
               </Button>
@@ -89,16 +100,8 @@ export default function DashboardHeader() {
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('/settings')}>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('/help')}>
-                <HelpCircle className="mr-2 h-4 w-4" />
-                Help & Support
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('/')}>
+              <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>
