@@ -2,6 +2,8 @@ import React from 'react';
 import { CircleDollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { ModeToggle } from "@/components/home/ModeToggle";
+
 
 function Navbar() {
   return (
@@ -19,6 +21,7 @@ function Navbar() {
         <Button asChild variant="outline">
           <Link href="/auth/login">Log In</Link>
         </Button>
+        <ModeToggle/>
       </nav>
     </header>
   );

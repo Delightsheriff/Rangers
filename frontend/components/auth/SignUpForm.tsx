@@ -63,7 +63,7 @@ export default function SignUpForm() {
   return (
     <div className="w-full">
       <Card>
-        <Form {...form}>
+        <Form {...form} >
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <CardContent className="pt-4">
               <div className="grid gap-4">

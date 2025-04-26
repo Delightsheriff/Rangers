@@ -1,7 +1,7 @@
 export default function HeroIllustration() {
   return (
     <div className="relative mx-auto max-w-md \">
-      <div className="rounded-lg bg-white p-4 shadow-lg">
+      <div className="rounded-lg  p-4 shadow-lg bg-white dark:bg-zinc-900">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-bold">Costa Rica Trip 2025</h3>
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">

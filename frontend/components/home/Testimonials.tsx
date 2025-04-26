@@ -10,7 +10,7 @@ export default function Testimonials() {
         </p>
       </div>
       <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-        <div className="rounded-lg border p-6">
+        <div className="rounded-lg border p-6 scale">
           <div className="mb-4 flex items-center gap-4">
             <div className="rounded-full bg-muted p-2">
               <svg
@@ -38,7 +38,7 @@ export default function Testimonials() {
             conversations about who owes what!&quot;
           </p>
         </div>
-        <div className="rounded-lg border p-6">
+        <div className="rounded-lg border p-6 scale">
           <div className="mb-4 flex items-center gap-4">
             <div className="rounded-full bg-muted p-2">
               <svg
@@ -66,7 +66,7 @@ export default function Testimonials() {
             expenses in real-time and settle up easily.&quot;
           </p>
         </div>
-        <div className="rounded-lg border p-6">
+        <div className="rounded-lg border p-6 scale">
           <div className="mb-4 flex items-center gap-4">
             <div className="rounded-full bg-muted p-2">
               <svg
