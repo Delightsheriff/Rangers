@@ -89,6 +89,35 @@ const schemas = {
       .min(1, 'At least one member is required'),
   }),
 
+  // Create expense schema
+  createExpense: z.object({
+    groupId: z.string().min(1, 'Group ID is required'),
+    description: z.string().min(1, 'Description is required'),
+    amount: z.number().positive('Amount must be a positive number'),
+    paidBy: z
+      .array(
+        z.object({
+          userId: z.string().min(1, 'User ID is required'),
+          amountPaid: z.number().positive('Amount paid must be a positive number'),
+        }),
+      )
+      .min(1, 'At least one payment is required'),
+  }),
+
+  // Update expense schema
+  updateExpense: z.object({
+    description: z.string().optional(),
+    amount: z.number().positive('Amount must be a positive number').optional(),
+    paidBy: z
+      .array(
+        z.object({
+          userId: z.string().min(1, 'User ID is required'),
+          amountPaid: z.number().positive('Amount paid must be a positive number'),
+        }),
+      )
+      .optional(),
+  }),
+
   // Add member to group schema
   addMember: z.object({
     email: z.string().email('Invalid email address'),

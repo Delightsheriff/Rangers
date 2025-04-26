@@ -80,6 +80,16 @@ app.get('/api', (req, res) => {
         getOne: 'GET /api/groups/:groupId',
         getAll: 'GET /api/groups',
       },
+      expenses: {
+        create: 'POST /api/expenses',
+        getAll: 'GET /api/groups/:groupId/expenses',
+        getOne: 'GET /api/expenses/:expenseId',
+        update: 'PUT /api/expenses/:expenseId',
+        delete: 'DELETE /api/expenses/:expenseId',
+      },
+      balance: {
+        get: 'GET /api/balance',
+      },
     },
     serverTime: new Date().toISOString(),
   });
@@ -88,6 +98,7 @@ app.get('/api', (req, res) => {
 // Routes
 app.use('/api', userRouter);
 app.use('/api', groupRouter);
+app.use('/api', expenseRouter);
 
 // Error handling middleware
 app.use(err);
