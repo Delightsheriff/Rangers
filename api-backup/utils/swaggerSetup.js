@@ -5,7 +5,7 @@ function generateSwaggerSpec(app, options = {}) {
     title = 'Auto-generated Swagger Docs',
     version = '1.0.0',
     description = '',
-    servers = [{ url: 'http://localhost:3000' }],
+    servers = [{ url: 'http://localhost:5000' }],
   } = options;
 
   const endpoints = listEndpoints(app);

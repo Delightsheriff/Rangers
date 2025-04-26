@@ -41,25 +41,11 @@ app.use(requestLogger); // Custom request logger
 app.use(apiLimiter); // Apply rate limiting to all routes
 
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, "public")));
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Body Parsing Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Root route
-// app.get('/', (req, res) => {
-//   res.json({
-//     success: true,
-//     message: 'Welcome to $plitwise API',
-//     description: 'A smart expense sharing application',
-//     version: '1.0.0',
-//     documentation: '/api',
-//     status: 'Online',
-//     serverTime: new Date().toISOString(),
-//   });
-// });
 
 // API root route
 
@@ -102,45 +88,11 @@ app.get('/api', (req, res) => {
     },
     serverTime: new Date().toISOString(),
   });
-
-// app.get('/api', (req, res) => {
-//   res.json({
-//     success: true,
-//     message: 'Welcome to $plitwise API endpoints',
-//     version: '1.0.0',
-//     endpoints: {
-//       auth: {
-//         register: 'POST /api/auth/register',
-//         login: 'POST /api/auth/login',
-//         logout: 'POST /api/auth/logout',
-//         refreshToken: 'POST /api/auth/refresh-token',
-//       },
-//       user: {
-//         getProfile: 'GET /api/users/:id',
-//         updateProfile: 'PUT /api/users/:id',
-//         deleteAccount: 'DELETE /api/users/:id',
-//       },
-//       password: {
-//         forgot: 'POST /api/auth/forgot-password',
-//         reset: 'POST /api/auth/reset-password',
-//       },
-//       groups: {
-//         create: 'POST /api/groups',
-//         getOne: 'GET /api/groups/:groupId',
-//         getAll: 'GET /api/groups',
-//       },
-//     },
-//     serverTime: new Date().toISOString(),
-//   });
-// });
+});
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
-
 });
-
-
-
 
 // Routes
 app.use('/api', userRouter);
@@ -155,4 +107,4 @@ const swaggerSpec = generateSwaggerSpec(app, {
   description: 'Auto-generated API docs',
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
