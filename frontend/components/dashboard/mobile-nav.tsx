@@ -9,9 +9,10 @@ import {
   Receipt,
   CreditCard,
   FileText,
-  Settings,
   Wallet,
+  LogOut,
 } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 
 interface MobileNavProps {
   onNavItemClick?: () => void;
@@ -57,12 +58,6 @@ export default function MobileNav({ onNavItemClick }: MobileNavProps) {
       icon: Wallet,
       id: 'wallet',
     },
-    {
-      name: 'Settings',
-      href: '/dashboard/settings',
-      icon: Settings,
-      id: 'settings',
-    },
   ];
 
   // Determine active item based on the current path
@@ -73,6 +68,10 @@ export default function MobileNav({ onNavItemClick }: MobileNavProps) {
   };
 
   const activeItem = getActiveItem();
+
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: '/' });
+  };
 
   return (
     <div className="flex h-full flex-col bg-card">
@@ -99,24 +98,32 @@ export default function MobileNav({ onNavItemClick }: MobileNavProps) {
           <span>SplitWise</span>
         </Link>
       </div>
-      <div className="flex-1 overflow-auto py-2">
-        <h3 className="px-4 py-2 text-sm font-medium text-muted-foreground">Menu</h3>
-        <nav className="grid gap-1 px-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={onNavItemClick}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                activeItem === item.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              {item.name}
-            </Link>
-          ))}
-        </nav>
+      <nav className="flex-1 space-y-1 p-4">
+        {navItems.map((item) => (
+          <Link
+            key={item.id}
+            href={item.href}
+            className={cn(
+              'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              activeItem === item.id
+                ? 'bg-primary/10 text-primary'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+            )}
+            onClick={onNavItemClick}
+          >
+            <item.icon className="h-4 w-4" />
+            {item.name}
+          </Link>
+        ))}
+      </nav>
+      <div className="border-t p-4">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <LogOut className="h-4 w-4" />
+          Log out
+        </button>
       </div>
     </div>
   );

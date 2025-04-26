@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,27 +17,112 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
+import { updateProfile } from '@/lib/profile-action';
+import { profileUpdateSchema } from '@/lib/validations/profile';
+import { ZodError, ZodIssue } from 'zod';
 
 export default function ProfilePage() {
+  const { data: session, update } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   // Form state
-  const [firstName, setFirstName] = useState('Alex');
-  const [lastName, setLastName] = useState('Johnson');
-  const [email, setEmail] = useState('alex@example.com');
-  const [phone, setPhone] = useState('555-123-4567');
-  const [currency, setCurrency] = useState('USD');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSavePersonal = (e: React.FormEvent) => {
+  // Initialize form with session data
+  useEffect(() => {
+    if (session?.user) {
+      setFirstName(session.user.firstName || '');
+      setLastName(session.user.lastName || '');
+      setEmail(session.user.email || '');
+    }
+  }, [session]);
+
+  const validateForm = () => {
+    try {
+      profileUpdateSchema.parse({ firstName, lastName });
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          const path = err.path[0] as string;
+          newErrors[path] = err.message;
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
+  const handleSavePersonal = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate form before submission
+    if (!validateForm()) {
+      toast.error('Please fix the validation errors');
+      return;
+    }
+
+    if (!session?.user?._id || !session?.accessToken) {
+      toast.error('You must be logged in to update your profile');
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const result = await updateProfile(
+        {
+          firstName,
+          lastName,
+        },
+        session.user._id,
+        session.accessToken,
+      );
+
+      if (result.success) {
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            ...(result?.data?.user ?? {}),
+          },
+        });
+        toast.success(result.message);
+      } else {
+        if (result.errors) {
+          // Handle validation errors from the server
+          const newErrors: Record<string, string> = {};
+          result.errors.forEach((err: ZodIssue) => {
+            const path = err.path[0] as string;
+            newErrors[path] = err.message;
+          });
+          setErrors(newErrors);
+          toast.error('Please fix the validation errors');
+        } else {
+          toast.error(result.message);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('An error occurred while updating your profile');
+    } finally {
       setIsLoading(false);
-      toast.success('Profile updated');
-    }, 1500);
+    }
   };
+
+  if (!session) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <main className="flex-1 p-2">
@@ -56,32 +141,24 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-start">
           <Avatar className="h-24 w-24">
-            <AvatarImage src="/placeholder.svg?height=96&width=96" alt="Alex Johnson" />
-            <AvatarFallback className="text-2xl">AJ</AvatarFallback>
+            <AvatarImage
+              src="/placeholder.svg?height=96&width=96"
+              alt={`${firstName} ${lastName}`}
+            />
+            <AvatarFallback className="text-2xl">{`${firstName.charAt(0)}${lastName.charAt(
+              0,
+            )}`}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-            <h2 className="text-xl font-bold">Alex Johnson</h2>
-            <p className="text-muted-foreground">alex@example.com</p>
-            <div className="mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  toast('Change profile picture');
-                }}
-              >
-                Change Picture
-              </Button>
-            </div>
+            <h2 className="text-xl font-bold">{`${firstName} ${lastName}`}</h2>
+            <p className="text-muted-foreground">{email}</p>
           </div>
         </div>
         <Card>
           <form onSubmit={handleSavePersonal}>
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
-              <CardDescription className="mb-4">
-                Update your personal details and preferences.
-              </CardDescription>
+              <CardDescription className="mb-4">Update your personal details.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-2">
@@ -90,7 +167,9 @@ export default function ProfilePage() {
                   id="firstName"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
+                  className={errors.firstName ? 'border-red-500' : ''}
                 />
+                {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="lastName">Last Name</Label>
@@ -98,35 +177,13 @@ export default function ProfilePage() {
                   id="lastName"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
+                  className={errors.lastName ? 'border-red-500' : ''}
                 />
+                {errors.lastName && <p className="text-sm text-red-500">{errors.lastName}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Phone Number (Optional)</Label>
-                <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="currency">Default Currency</Label>
-                <select
-                  id="currency"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                >
-                  <option value="USD">USD ($)</option>
-                  <option value="EUR">EUR (€)</option>
-                  <option value="GBP">GBP (£)</option>
-                  <option value="JPY">JPY (¥)</option>
-                  <option value="CAD">CAD ($)</option>
-                </select>
+                <Input id="email" type="email" value={email} disabled className="bg-muted" />
               </div>
             </CardContent>
             <CardFooter className="mt-4">
