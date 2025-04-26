@@ -49,7 +49,6 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
-
 // Landing page for the api
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
