@@ -8,11 +8,11 @@ Team Rangers participated in ADC Hackathon 2025 and this concept is to create an
 
 ## About ✍️
 
-## An app where users can log shared expenses (e.g., for roommates, trips, or group outings), and it calculates who owes what amount.
+An app where users can log shared expenses (e.g., for roommates, trips, or group outings), and it calculates who owes what amount.
 
 ## Features 🌠
 
-Here’s what makes Educare stand out:
+Here’s what makes SplitWise stand out:
 
 ### Frontend Features
 
@@ -112,7 +112,7 @@ PORT=3000
 
 - **Next.js with Typescript**: For building the user interface.
 - **Tailwind CSS**: For styling the components.
-- **Next-auth**: For making API calls for authetication and authorisation.
+- **Next-auth**: For making API calls for authentication and authorisation.
 
 ### Backend
 

@@ -1,0 +1,10 @@
+{
+  "name": "rangers",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "cd api-backup && npm start"
+  },
+  "cacheDirectories": [
+    "api-backup/node_modules"
+  ]
+}

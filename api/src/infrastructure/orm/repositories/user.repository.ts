@@ -35,7 +35,7 @@ export class UserRepository {
     return await this.userModel.findOne({ where: { email } });
   }
 
-  async findById(id: string): Promise<UserEntity | null> {
+  async findById(id: number): Promise<UserEntity | null> {
     return await this.userModel.findByPk(id, {
       attributes: { exclude: ['password'] },
     });
@@ -49,11 +49,11 @@ export class UserRepository {
     return await this.userModel.findOne({ where: { username } });
   }
 
-  async update(id: string, data: Partial<UserEntity>): Promise<void> {
+  async update(id: number, data: Partial<UserEntity>): Promise<void> {
     await this.userModel.update(data, { where: { id } });
   }
 
-  async findAll(): Promise<UserEntity[]> {
-    return await this.userModel.findAll();
+  async findAll(userIds: Array<number>): Promise<UserEntity[]> {
+    return await this.userModel.findAll({ where: { id: userIds } });
   }
 }

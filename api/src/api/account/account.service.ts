@@ -5,7 +5,7 @@ import { UserRepository } from 'src/infrastructure/orm/repositories/user.reposit
 export class AccountService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async getAccountDetails(userId: string) {
+  async getAccountDetails(userId: number) {
     const user = await this.userRepository.findById(userId);
 
     if (!user) throw new NotFoundException('User not found');
@@ -14,7 +14,7 @@ export class AccountService {
   }
 
   async updateAccountDetails(
-    userId: string,
+    userId: number,
     updateData: {
       firstName?: string;
       lastName?: string;
