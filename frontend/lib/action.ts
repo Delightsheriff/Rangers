@@ -3,7 +3,7 @@
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { authOptions } from './auth';
-import { Group as GroupInterface } from '@/interface/group';
+import { Group, GroupDetails } from '@/interface/group';
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -123,23 +123,6 @@ export async function createGroup(groupData: {
   }
 }
 
-// API response type
-type ApiGroup = {
-  id: string;
-  name: string;
-  description: string;
-  creator: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  memberCount: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type Group = GroupInterface;
-
 export type GetUserGroupsResult = {
   success: boolean;
   data?: {
@@ -176,23 +159,11 @@ export async function getUserGroups(): Promise<GetUserGroupsResult> {
       };
     }
 
-    // Transform the API response to match the expected Group interface
-    const transformedGroups: Group[] = result.groups.map((group: ApiGroup) => ({
-      id: group.id,
-      name: group.name,
-      description: group.description,
-      members: group.memberCount || 0,
-      expenses: 0, // These will need to be calculated or fetched separately
-      totalAmount: 0,
-      youOwe: 0,
-      youAreOwed: 0,
-      isActive: true,
-    }));
-
+    // The API now returns the data in the correct format, no transformation needed
     return {
       success: true,
       data: {
-        groups: transformedGroups,
+        groups: result.groups,
       },
     };
   } catch (error) {
@@ -273,7 +244,7 @@ export async function leaveGroup(groupId: string): Promise<LeaveGroupResult> {
     }
 
     const response = await fetch(`${URL}/groups/${groupId}/leave`, {
-      method: 'DELETE',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${session.accessToken}`,
@@ -355,34 +326,6 @@ export async function deleteGroup(groupId: string): Promise<DeleteGroupResult> {
   }
 }
 
-export type GroupMember = {
-  id: string | null;
-  name: string | null;
-  email: string;
-  isActive: boolean;
-  joinedAt: string;
-};
-
-export type GroupInvite = {
-  email: string;
-  invitedAt: string;
-};
-
-export type GroupDetails = {
-  id: string;
-  name: string;
-  description: string;
-  creator: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  members: GroupMember[];
-  invitedUsers: GroupInvite[];
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type GetGroupDetailsResult = {
   success: boolean;
   data?: {
@@ -419,6 +362,7 @@ export async function getGroupDetails(groupId: string): Promise<GetGroupDetailsR
       };
     }
 
+    // The API now returns the data in the correct format, no transformation needed
     return {
       success: true,
       data: {
