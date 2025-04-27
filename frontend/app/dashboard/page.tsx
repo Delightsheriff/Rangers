@@ -91,7 +91,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-muted-foreground">
                     Start a group to track all expenses.
                   </p>
-                  <Link href="/groups/new">
+                  <Link href="dashboard/groups/new">
                     <Button variant="outline" className="mt-2 w-full">
                       Create Group
                     </Button>
@@ -106,7 +106,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-muted-foreground">
                     Keep tabs on what everyone owes in your group.
                   </p>
-                  <Link href="/expenses">
+                  <Link href="/dashboard/expenses">
                     <Button variant="outline" className="mt-2 w-full">
                       Check Expenses
                     </Button>
