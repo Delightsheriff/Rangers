@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const { paidExpense } = require('../controller/expenseController');
 
 /**
  * Middleware to validate request body against a Zod schema
@@ -122,6 +123,14 @@ const schemas = {
   addMember: z.object({
     email: z.string().email('Invalid email address'),
   }),
+
+  // Paid expense schema
+  paidExpense: z.array(
+      z.object({
+        userId: z.string().min(1, 'User ID is required'),
+        amountPaid: z.number().positive('Amount paid must be a positive number'),
+      }),
+    ),
 };
 
 module.exports = {
