@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,7 +8,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, UserPlus, Loader2, Receipt, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
 import { toast } from 'sonner';
 import { getGroupDetails, addMemberToGroup } from '@/lib/action';
 import { GroupDetails, GroupExpense } from '@/interface/group';

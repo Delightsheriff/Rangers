@@ -1,9 +1,10 @@
-const ExpenseModel = require('../model/expenseModel');
+const { ExpenseModel } = require('../model/expenseModel');
+const { GroupModel } = require('../model/groupModel');
 
 // Create new Expense
 exports.createExpense = async (req, res) => {
   try {
-    const { groupId, description, amount, paidBy, paidAt } = req.body;
+    const { groupId, description, amount, paidBy } = req.body;
 
     // Validate input
     if (!groupId || !description || !amount || !paidBy) {
@@ -15,25 +16,30 @@ exports.createExpense = async (req, res) => {
     if (!group) {
       return res.status(404).json({ message: 'Group not found' });
     }
-    
-    const amountToBePaid = amount / group.members.length;
 
+    // Calculate equal split amount
+    const activeMembersCount = group.members.filter((member) => member.isActive).length;
+    const amountPerPerson = amount / activeMembersCount;
 
     // Create new expense
     const newExpense = await ExpenseModel.create({
-      groupId,
+      name: description, // Using description as name
       description,
-      amount: amountToBePaid,
-      amountPaid: amount,
-      paidBy,
-      paidAt,
+      amount,
+      date: new Date(),
+      groupId,
+      paidBy: paidBy.map((payment) => ({
+        userId: payment.userId,
+        amountPaid: payment.amountPaid,
+        paidAt: new Date(),
+      })),
     });
 
     res.status(201).json(newExpense);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 // Get all expenses for a group
 exports.getAllExpenses = async (req, res) => {
@@ -44,7 +50,7 @@ exports.getAllExpenses = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 // Get a single expense
 exports.getExpense = async (req, res) => {
@@ -55,11 +61,10 @@ exports.getExpense = async (req, res) => {
       return res.status(404).json({ message: 'Expense not found' });
     }
     res.status(200).json(expense);
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 // Update an expense
 exports.updateExpense = async (req, res) => {
@@ -76,7 +81,7 @@ exports.updateExpense = async (req, res) => {
     const updatedExpense = await ExpenseModel.findByIdAndUpdate(
       expenseId,
       { description, amount, paidBy, paidAt },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedExpense) {
@@ -87,7 +92,7 @@ exports.updateExpense = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 // Delete an expense
 exports.deleteExpense = async (req, res) => {
@@ -101,7 +106,7 @@ exports.deleteExpense = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 // Get all expenses for a user
 exports.getUserExpenses = async (req, res) => {
@@ -112,7 +117,7 @@ exports.getUserExpenses = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 // Paid an expense
 exports.paidExpense = async (req, res) => {
@@ -129,7 +134,7 @@ exports.paidExpense = async (req, res) => {
     const updatedExpense = await ExpenseModel.findByIdAndUpdate(
       expenseId,
       { $push: { paidBy: { userId, amountPaid } } },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedExpense) {
@@ -140,4 +145,4 @@ exports.paidExpense = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};

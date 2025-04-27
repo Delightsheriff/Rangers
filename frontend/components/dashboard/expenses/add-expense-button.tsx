@@ -2,8 +2,8 @@
 
 import type React from 'react';
 
-import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -24,7 +24,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { CalendarIcon } from 'lucide-react';
@@ -32,75 +31,172 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/date-utils';
+import { getUserGroups } from '@/lib/action';
+import { getGroupDetails } from '@/lib/action';
+import { createExpense } from '@/lib/action';
+import { toast } from 'sonner';
+import { Group } from '@/interface/group';
+
+interface Member {
+  id: string | null;
+  name: string | null;
+  email: string;
+  isActive: boolean;
+  joinedAt: string;
+  avatar?: string;
+}
 
 interface AddExpenseButtonProps {
   onSuccess?: () => void;
+  groupId?: string;
 }
 
-export default function AddExpenseButton({ onSuccess }: AddExpenseButtonProps) {
+export default function AddExpenseButton({ onSuccess, groupId }: AddExpenseButtonProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingGroups, setIsLoadingGroups] = useState(false);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
   // Form state
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
-  const [group, setGroup] = useState('');
-  const [paidBy, setPaidBy] = useState('');
-  const [splitType, setSplitType] = useState('equal');
+  const [amount, setAmount] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [selectedGroupId, setSelectedGroupId] = useState<string>('');
+  const [paidBy, setPaidBy] = useState<string>('');
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [selectedPeople, setSelectedPeople] = useState<string[]>([
-    'member-1',
-    'member-2',
-    'member-3',
-    'member-4',
-  ]);
+  const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
 
-  // This would come from an API in a real app
-  const groups = [
-    { id: 'group-1', name: 'Apartment 304' },
-    { id: 'group-2', name: 'Cancun Trip 2025' },
-    { id: 'group-3', name: 'Dinner Club' },
-    { id: 'group-4', name: 'Office Lunch Group' },
-  ];
+  // Data state
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
 
-  // This would come from the selected group in a real app
-  const members = [
-    { id: 'member-1', name: 'You (Alex)', initials: 'AJ' },
-    { id: 'member-2', name: 'Taylor Smith', initials: 'TS' },
-    { id: 'member-3', name: 'Morgan Chen', initials: 'MC' },
-    { id: 'member-4', name: 'Jordan Lee', initials: 'JL' },
-    { id: 'member-5', name: 'Riley Davis', initials: 'RD' },
-  ];
+  // Fetch groups on component mount
+  useEffect(() => {
+    const fetchGroups = async () => {
+      setIsLoadingGroups(true);
+      try {
+        const result = await getUserGroups();
+        if (result.success && result.data) {
+          setGroups(result.data.groups);
 
-  const handleSubmit = (e: React.FormEvent) => {
+          // If groupId is provided, select it by default
+          if (groupId && result.data.groups.some((g) => g.id === groupId)) {
+            setSelectedGroupId(groupId);
+            fetchMembers(groupId);
+          }
+        } else {
+          toast.error(result.error || 'Failed to load groups');
+        }
+      } catch (error) {
+        console.error('Error fetching groups:', error);
+        toast.error('Failed to load groups');
+      } finally {
+        setIsLoadingGroups(false);
+      }
+    };
+
+    fetchGroups();
+  }, [groupId]);
+
+  // Fetch members when a group is selected
+  const fetchMembers = async (groupId: string) => {
+    setIsLoadingMembers(true);
+    try {
+      const result = await getGroupDetails(groupId);
+      if (result.success && result.data) {
+        const groupMembers = result.data.group.members;
+        setMembers(groupMembers);
+
+        // Set all active members as selected by default
+        const activeMemberIds = groupMembers
+          .filter((member: Member) => member.isActive)
+          .map((member: Member) => member.id || member.email);
+
+        setSelectedPeople(activeMemberIds);
+
+        // Set current user as the default payer
+        if (activeMemberIds.length > 0) {
+          setPaidBy(activeMemberIds[0]);
+        }
+      } else {
+        toast.error(result.error || 'Failed to load group members');
+      }
+    } catch (error) {
+      console.error('Error fetching group members:', error);
+      toast.error('Failed to load group members');
+    } finally {
+      setIsLoadingMembers(false);
+    }
+  };
+
+  const handleGroupChange = (value: string) => {
+    setSelectedGroupId(value);
+    fetchMembers(value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setOpen(false);
-      resetForm();
-      if (onSuccess) {
-        onSuccess();
+    try {
+      // Calculate equal split amount
+      const amountValue = parseFloat(amount);
+
+      // Prepare paidBy data - only include the person who paid
+      const paidByData = [
+        {
+          userId: paidBy,
+          amountPaid: amountValue,
+        },
+      ];
+
+      // Create expense
+      const result = await createExpense({
+        groupId: selectedGroupId,
+        description,
+        amount: amountValue,
+        paidBy: paidByData,
+      });
+
+      if (result.success) {
+        toast.success('Expense added successfully');
+        setOpen(false);
+        resetForm();
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        toast.error(result.error || 'Failed to add expense');
       }
-    }, 1500);
+    } catch (error) {
+      console.error('Error adding expense:', error);
+      toast.error('An error occurred while adding the expense');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const resetForm = () => {
     setAmount('');
     setDescription('');
-    setGroup('');
+    setSelectedGroupId(groupId || '');
     setPaidBy('');
-    setSplitType('equal');
     setDate(new Date());
-    setSelectedPeople(['member-1', 'member-2', 'member-3', 'member-4']);
+    setSelectedPeople([]);
   };
 
   const togglePersonSelection = (memberId: string) => {
     setSelectedPeople((prev) =>
       prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId],
     );
+  };
+
+  const getInitials = (name: string | null) => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
   };
 
   return (
@@ -122,9 +218,16 @@ export default function AddExpenseButton({ onSuccess }: AddExpenseButtonProps) {
           <div className="grid gap-6 py-4">
             <div className="grid gap-2">
               <Label htmlFor="group">Group</Label>
-              <Select value={group} onValueChange={setGroup} required>
+              <Select
+                value={selectedGroupId}
+                onValueChange={handleGroupChange}
+                required
+                disabled={!!groupId || isLoadingGroups}
+              >
                 <SelectTrigger id="group">
-                  <SelectValue placeholder="Select group" />
+                  <SelectValue
+                    placeholder={isLoadingGroups ? 'Loading groups...' : 'Select group'}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {groups.map((group) => (
@@ -191,14 +294,21 @@ export default function AddExpenseButton({ onSuccess }: AddExpenseButtonProps) {
 
             <div className="grid gap-2">
               <Label htmlFor="paid-by">Paid by</Label>
-              <Select value={paidBy} onValueChange={setPaidBy} required>
+              <Select
+                value={paidBy}
+                onValueChange={setPaidBy}
+                required
+                disabled={isLoadingMembers || members.length === 0}
+              >
                 <SelectTrigger id="paid-by">
-                  <SelectValue placeholder="Who paid?" />
+                  <SelectValue
+                    placeholder={isLoadingMembers ? 'Loading members...' : 'Who paid?'}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {members.map((member) => (
-                    <SelectItem key={member.id} value={member.id}>
-                      {member.name}
+                    <SelectItem key={member.id || member.email} value={member.id || member.email}>
+                      {member.name || member.email}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -208,71 +318,50 @@ export default function AddExpenseButton({ onSuccess }: AddExpenseButtonProps) {
             <div className="grid gap-2">
               <Label>Split between</Label>
               <div className="space-y-2 rounded-md border p-4">
-                {members.map((member) => (
-                  <div key={member.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`person-${member.id}`}
-                      checked={selectedPeople.includes(member.id)}
-                      onCheckedChange={() => togglePersonSelection(member.id)}
-                    />
-                    <Label
-                      htmlFor={`person-${member.id}`}
-                      className="flex cursor-pointer items-center gap-2 text-sm font-normal"
-                    >
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-xs">{member.initials}</AvatarFallback>
-                      </Avatar>
-                      {member.name}
-                    </Label>
+                {isLoadingMembers ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    <span className="ml-2 text-sm text-muted-foreground">Loading members...</span>
                   </div>
-                ))}
+                ) : members.length === 0 ? (
+                  <div className="py-4 text-center text-sm text-muted-foreground">
+                    No members found in this group
+                  </div>
+                ) : (
+                  members.map((member) => (
+                    <div key={member.id || member.email} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`person-${member.id || member.email}`}
+                        checked={selectedPeople.includes(member.id || member.email)}
+                        onCheckedChange={() => togglePersonSelection(member.id || member.email)}
+                        disabled={!member.isActive}
+                      />
+                      <Label
+                        htmlFor={`person-${member.id || member.email}`}
+                        className={cn(
+                          'flex cursor-pointer items-center gap-2 text-sm font-normal',
+                          !member.isActive && 'text-muted-foreground',
+                        )}
+                      >
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-xs">
+                            {getInitials(member.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        {member.name || member.email}
+                        {!member.isActive && ' (Pending)'}
+                      </Label>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label>How do you want to split the expense?</Label>
-              <RadioGroup
-                value={splitType}
-                onValueChange={setSplitType}
-                className="flex flex-col space-y-1"
-              >
-                <div className="flex items-center space-x-2 rounded-md border p-3">
-                  <RadioGroupItem value="equal" id="split-equal" />
-                  <Label
-                    htmlFor="split-equal"
-                    className="flex cursor-pointer items-center gap-2 text-sm font-normal"
-                  >
-                    Split equally
-                    <span className="text-xs text-muted-foreground">
-                      (Everyone pays the same amount)
-                    </span>
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 rounded-md border p-3">
-                  <RadioGroupItem value="percentage" id="split-percentage" />
-                  <Label
-                    htmlFor="split-percentage"
-                    className="flex cursor-pointer items-center gap-2 text-sm font-normal"
-                  >
-                    Split by percentages
-                    <span className="text-xs text-muted-foreground">
-                      (Specify what percentage each person should pay)
-                    </span>
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 rounded-md border p-3">
-                  <RadioGroupItem value="custom" id="split-custom" />
-                  <Label
-                    htmlFor="split-custom"
-                    className="flex cursor-pointer items-center gap-2 text-sm font-normal"
-                  >
-                    Split by custom amounts
-                    <span className="text-xs text-muted-foreground">
-                      (Specify exact amounts for each person)
-                    </span>
-                  </Label>
-                </div>
-              </RadioGroup>
+            <div className="rounded-md bg-muted p-4 text-sm">
+              <p className="font-medium">Equal Split</p>
+              <p className="text-muted-foreground">
+                The expense will be split equally between all selected members.
+              </p>
             </div>
           </div>
           <DialogFooter>
@@ -282,33 +371,16 @@ export default function AddExpenseButton({ onSuccess }: AddExpenseButtonProps) {
                 isLoading ||
                 !amount ||
                 !description ||
-                !group ||
+                !selectedGroupId ||
                 !paidBy ||
-                selectedPeople.length === 0
+                selectedPeople.length === 0 ||
+                isLoadingGroups ||
+                isLoadingMembers
               }
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
-                  <svg
-                    className="h-4 w-4 animate-spin"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Saving...</span>
                 </div>
               ) : (

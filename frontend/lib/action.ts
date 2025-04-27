@@ -377,3 +377,75 @@ export async function getGroupDetails(groupId: string): Promise<GetGroupDetailsR
     };
   }
 }
+
+export type CreateExpenseResult = {
+  success: boolean;
+  data?: {
+    id: string;
+    name: string;
+    description: string;
+    amount: number;
+    date: string;
+    groupId: string;
+    paidBy: Array<{
+      userId: string;
+      amountPaid: number;
+      paidAt: string;
+    }>;
+  };
+  error?: string;
+};
+
+export async function createExpense(expenseData: {
+  groupId: string;
+  description: string;
+  amount: number;
+  paidBy: Array<{
+    userId: string;
+    amountPaid: number;
+  }>;
+}): Promise<CreateExpenseResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to create an expense',
+      };
+    }
+
+    const response = await fetch(`${URL}/expenses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      body: JSON.stringify(expenseData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to create expense',
+      };
+    }
+
+    // Revalidate the groups page to refresh the data
+    revalidatePath('/dashboard/groups');
+    revalidatePath(`/dashboard/groups/${expenseData.groupId}`);
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    console.error('Error creating expense:', error);
+    return {
+      success: false,
+      error: 'Failed to create expense. Please try again later.',
+    };
+  }
+}
