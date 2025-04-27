@@ -9,6 +9,7 @@ const {
   deleteExpense,
   getUserExpenses,
   paidExpense,
+  sendReminder,
 } = require('../controller/expenseController');
 
 // Create a new router instance
@@ -26,13 +27,26 @@ const expenseRouter = Router()
   .get('/expenses/:expenseId', authMiddleware, getExpense)
 
   // Route to update an expense
-  .put('/expenses/:expenseId', authMiddleware, validateRequest(schemas.updateExpense), updateExpense)
+  .put(
+    '/expenses/:expenseId',
+    authMiddleware,
+    validateRequest(schemas.updateExpense),
+    updateExpense,
+  )
 
   // Route to pay an expense
-  .put('/expenses/:expenseId/paid', authMiddleware, validateRequest(schemas.updateExpense), paidExpense)
+  .put(
+    '/expenses/:expenseId/paid',
+    authMiddleware,
+    validateRequest(schemas.updateExpense),
+    paidExpense,
+  )
 
   // Route to delete an expense
-  .delete('/expenses/:expenseId', authMiddleware, deleteExpense);
+  .delete('/expenses/:expenseId', authMiddleware, deleteExpense)
+
+  // Send payment reminder
+  .post('/:expenseId/remind', authMiddleware, sendReminder);
 
 // Export the router to be used in other parts of the application
 module.exports = expenseRouter;

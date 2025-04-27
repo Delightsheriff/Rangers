@@ -93,6 +93,20 @@ const emailTemplates = {
             </div>
         `,
   }),
+
+  paymentReminder: (debtorName, creditorName, amount, groupName) => ({
+    subject: `Payment Reminder: You owe ${creditorName} $${amount} in ${groupName}`,
+    html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2>Payment Reminder</h2>
+                <p>Hi ${debtorName},</p>
+                <p>This is a friendly reminder that you owe <strong>${creditorName}</strong> <strong>$${amount}</strong> in the group <strong>${groupName}</strong>.</p>
+                <p>Please settle this payment at your earliest convenience to keep your expense sharing smooth and hassle-free.</p>
+                <p>You can log in to your $plitwise account to view the expense details and record your payment.</p>
+                <p>Best regards,<br>The $plitwise Team</p>
+            </div>
+        `,
+  }),
 };
 
 // Create reusable transporter

@@ -1,14 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, UserPlus, Edit, Loader2 } from 'lucide-react';
+import { ArrowLeft, UserPlus, Loader2, Receipt, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
 import { toast } from 'sonner';
-import { getGroupDetails, GroupDetails, addMemberToGroup } from '@/lib/action';
+import { getGroupDetails, addMemberToGroup } from '@/lib/action';
+import { GroupDetails, GroupExpense } from '@/interface/group';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +21,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { AddExpenseButton } from '@/components/dashboard/expenses/add-expense-button';
 
 export default function GroupPage() {
   const params = useParams();
@@ -26,38 +30,30 @@ export default function GroupPage() {
   const groupId = params.id as string;
 
   const [group, setGroup] = useState<GroupDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isInviteLoading, setIsInviteLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchGroupDetails = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const result = await getGroupDetails(groupId);
-
-        if (result.success && result.data) {
-          setGroup(result.data.group);
-        } else {
-          setError(result.error || 'Failed to load group details');
-          toast.error(result.error || 'Failed to load group details');
-        }
-      } catch (err) {
-        console.error('Error fetching group details:', err);
-        setError('An error occurred while loading the group');
-        toast.error('An error occurred while loading the group');
-      } finally {
-        setIsLoading(false);
+  const fetchGroupDetails = async () => {
+    try {
+      const result = await getGroupDetails(groupId);
+      if (result.success && result.data) {
+        setGroup(result.data.group);
+      } else {
+        toast.error(result.error || 'Failed to load group details');
       }
-    };
-
-    if (groupId) {
-      fetchGroupDetails();
+    } catch (error) {
+      console.error('Error fetching group details:', error);
+      toast.error('Failed to load group details');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchGroupDetails();
   }, [groupId]);
 
   const openInviteModal = () => {
@@ -99,22 +95,53 @@ export default function GroupPage() {
     }
   };
 
-  if (isLoading) {
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
+  // Format balance display
+  const formatBalance = (balance: number) => {
+    const formattedAmount = formatCurrency(Math.abs(balance));
+    return balance >= 0 ? `You are owed ${formattedAmount}` : `You owe ${formattedAmount}`;
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  if (loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Loading group details...</p>
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading group details...</p>
+        </div>
       </div>
     );
   }
 
   if (error || !group) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold">Error Loading Group</h2>
-          <p className="mt-2 text-muted-foreground">{error || 'Group not found'}</p>
-          <Button className="mt-4" onClick={() => router.push('/dashboard/groups')}>
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="rounded-full bg-destructive/10 p-3 text-destructive">
+            <FileText className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Error Loading Group</h2>
+            <p className="text-sm text-muted-foreground">{error || 'Group not found'}</p>
+          </div>
+          <Button onClick={() => router.push('/dashboard/groups')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Groups
           </Button>
         </div>
@@ -122,141 +149,165 @@ export default function GroupPage() {
     );
   }
 
-  // Get initials for avatar fallback
   const getInitials = (name: string | null) => {
     if (!name) return '?';
     return name
       .split(' ')
-      .map((part) => part[0])
+      .map((n) => n[0])
       .join('')
-      .toUpperCase()
-      .substring(0, 2);
+      .toUpperCase();
+  };
+
+  // Update the Member type to match the actual data structure
+  type Member = {
+    id: string | null;
+    name: string | null;
+    email: string;
+    isActive: boolean;
+    joinedAt: string;
+    avatar?: string;
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="flex flex-1">
-        <main className="flex-1 p-6">
-          <div className="mb-6">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard/groups">
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="sr-only">Back</span>
-                </Button>
-              </Link>
-              <h1 className="text-2xl font-bold">{group.name}</h1>
-              <Badge variant="outline" className="ml-2">
-                {group.members.length} members
-              </Badge>
-              <div className="ml-auto flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                  onClick={() => {
-                    toast('This feature is coming soon.');
-                  }}
-                >
-                  <Edit className="h-4 w-4" />
-                  Edit Group
-                </Button>
-                <Button>Add Expense</Button>
+    <div className="container mx-auto py-6">
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard/groups')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold">{group.name}</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={openInviteModal}>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Invite Member
+          </Button>
+          <AddExpenseButton onSuccess={fetchGroupDetails} />
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="md:col-span-2">
+          <div className="mb-6 rounded-lg border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Group Details</h2>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Description</p>
+                <p>{group.description || 'No description provided'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Created by</p>
+                <p>{group.creator.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Created on</p>
+                <p>{formatDate(group.createdAt)}</p>
               </div>
             </div>
-            <p className="mt-1 text-muted-foreground">{group.description}</p>
           </div>
 
-          <div className="mb-6">
-            <h2 className="mb-2 text-lg font-semibold">Members</h2>
-            <div className="flex flex-wrap gap-2">
-              {group.members.map((member) => (
-                <div
-                  key={member.email}
-                  className="flex items-center gap-2 rounded-full border p-1 pr-3"
+          <div className="rounded-lg border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Expenses</h2>
+            {group.expenses.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Receipt className="mb-2 h-8 w-8 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">No expenses yet</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {group.expenses.map((expense: GroupExpense) => (
+                  <div key={expense.id} className="rounded-md border p-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-medium">{expense.name}</h3>
+                        <p className="text-sm text-muted-foreground">{expense.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">{formatCurrency(expense.amount)}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(expense.date)}</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-sm">
+                      <p className="text-muted-foreground">Paid by:</p>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {expense.paidBy.map((payment) => (
+                          <Badge key={payment.userId} variant="outline">
+                            {payment.amountPaid > 0
+                              ? `${formatCurrency(payment.amountPaid)}`
+                              : 'No payment'}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <div className="mb-6 rounded-lg border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Summary</h2>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Amount</p>
+                <p className="text-xl font-semibold">{formatCurrency(group.totalAmount)}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Your Balance</p>
+                <p
+                  className={cn(
+                    'text-xl font-semibold',
+                    group.userBalance >= 0 ? 'text-green-600' : 'text-red-600',
+                  )}
                 >
-                  <Avatar className="h-8 w-8">
+                  {formatBalance(group.userBalance)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Members</h2>
+            <div className="space-y-4">
+              {group.members.map((member: Member) => (
+                <div key={member.email} className="flex items-center gap-3">
+                  <Avatar>
                     <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
                   </Avatar>
-                  <span className="text-sm">{member.name || member.email}</span>
+                  <div>
+                    <p className="font-medium">{member.name || member.email}</p>
+                    <p className="text-xs text-muted-foreground">{member.email}</p>
+                  </div>
                   {member.isActive ? (
-                    <Badge variant="outline" className="ml-1 h-5 text-xs">
-                      Active
-                    </Badge>
+                    <Badge className="ml-auto">Active</Badge>
                   ) : (
-                    <Badge variant="secondary" className="ml-1 h-5 text-xs">
+                    <Badge variant="outline" className="ml-auto">
                       Pending
                     </Badge>
                   )}
                 </div>
               ))}
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1 rounded-full"
-                onClick={openInviteModal}
-              >
-                <UserPlus className="h-4 w-4" />
-                Invite
-              </Button>
             </div>
           </div>
-
-          {group.invitedUsers.length > 0 && (
-            <div className="mb-6">
-              <h2 className="mb-2 text-lg font-semibold">Pending Invitations</h2>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-2 gap-4 p-4 text-sm font-medium text-muted-foreground">
-                  <div>Email</div>
-                  <div>Invited On</div>
-                </div>
-                {group.invitedUsers.map((invite) => (
-                  <div key={invite.email} className="grid grid-cols-2 gap-4 border-t p-4">
-                    <div>{invite.email}</div>
-                    <div>{new Date(invite.invitedAt).toLocaleDateString()}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mb-6">
-            <h2 className="mb-2 text-lg font-semibold">Group Information</h2>
-            <div className="rounded-md border p-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-sm font-medium text-muted-foreground">Created by</div>
-                <div>{group.creator.name}</div>
-
-                <div className="text-sm font-medium text-muted-foreground">Created on</div>
-                <div>{new Date(group.createdAt).toLocaleDateString()}</div>
-
-                <div className="text-sm font-medium text-muted-foreground">Last updated</div>
-                <div>{new Date(group.updatedAt).toLocaleDateString()}</div>
-              </div>
-            </div>
-          </div>
-        </main>
+        </div>
       </div>
 
-      {/* Invite Member Modal */}
-      <Dialog
-        open={isInviteModalOpen}
-        onOpenChange={(open) => {
-          if (!open) closeInviteModal();
-        }}
-      >
+      <Dialog open={isInviteModalOpen} onOpenChange={setIsInviteModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Invite Member</DialogTitle>
-            <DialogDescription>Enter the email of the person to invite.</DialogDescription>
+            <DialogDescription>
+              Enter the email address of the person you want to invite to this group.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email address</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="example@email.com"
+                placeholder="name@example.com"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 disabled={isInviteLoading}

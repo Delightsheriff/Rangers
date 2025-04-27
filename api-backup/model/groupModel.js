@@ -61,6 +61,13 @@ const GroupSchema = new mongoose.Schema(
   },
 );
 
+// Virtual field for expenses
+GroupSchema.virtual('expenses', {
+  ref: 'Expense',
+  localField: '_id',
+  foreignField: 'groupId',
+});
+
 // Method to add a member to the group
 GroupSchema.methods.addMember = async function (userId, email) {
   // Check if user is already a member

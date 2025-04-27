@@ -3,7 +3,9 @@
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { authOptions } from './auth';
-import { Group as GroupInterface } from '@/interface/group';
+import { Group, GroupDetails } from '@/interface/group';
+import { ApiResult } from '@/types/api';
+// import { getSessionToken } from '@/lib/auth';
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -123,23 +125,6 @@ export async function createGroup(groupData: {
   }
 }
 
-// API response type
-type ApiGroup = {
-  id: string;
-  name: string;
-  description: string;
-  creator: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  memberCount: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type Group = GroupInterface;
-
 export type GetUserGroupsResult = {
   success: boolean;
   data?: {
@@ -176,23 +161,11 @@ export async function getUserGroups(): Promise<GetUserGroupsResult> {
       };
     }
 
-    // Transform the API response to match the expected Group interface
-    const transformedGroups: Group[] = result.groups.map((group: ApiGroup) => ({
-      id: group.id,
-      name: group.name,
-      description: group.description,
-      members: group.memberCount || 0,
-      expenses: 0, // These will need to be calculated or fetched separately
-      totalAmount: 0,
-      youOwe: 0,
-      youAreOwed: 0,
-      isActive: true,
-    }));
-
+    // The API now returns the data in the correct format, no transformation needed
     return {
       success: true,
       data: {
-        groups: transformedGroups,
+        groups: result.groups,
       },
     };
   } catch (error) {
@@ -273,7 +246,7 @@ export async function leaveGroup(groupId: string): Promise<LeaveGroupResult> {
     }
 
     const response = await fetch(`${URL}/groups/${groupId}/leave`, {
-      method: 'DELETE',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${session.accessToken}`,
@@ -355,34 +328,6 @@ export async function deleteGroup(groupId: string): Promise<DeleteGroupResult> {
   }
 }
 
-export type GroupMember = {
-  id: string | null;
-  name: string | null;
-  email: string;
-  isActive: boolean;
-  joinedAt: string;
-};
-
-export type GroupInvite = {
-  email: string;
-  invitedAt: string;
-};
-
-export type GroupDetails = {
-  id: string;
-  name: string;
-  description: string;
-  creator: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  members: GroupMember[];
-  invitedUsers: GroupInvite[];
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type GetGroupDetailsResult = {
   success: boolean;
   data?: {
@@ -419,6 +364,7 @@ export async function getGroupDetails(groupId: string): Promise<GetGroupDetailsR
       };
     }
 
+    // The API now returns the data in the correct format, no transformation needed
     return {
       success: true,
       data: {
@@ -430,6 +376,273 @@ export async function getGroupDetails(groupId: string): Promise<GetGroupDetailsR
     return {
       success: false,
       error: 'Failed to fetch group details. Please try again later.',
+    };
+  }
+}
+
+export type CreateExpenseResult = {
+  success: boolean;
+  data?: {
+    id: string;
+    name: string;
+    description: string;
+    amount: number;
+    date: string;
+    groupId: string;
+    paidBy: Array<{
+      userId: string;
+      amountPaid: number;
+      paidAt: string;
+    }>;
+  };
+  error?: string;
+};
+
+export async function createExpense(expenseData: {
+  groupId: string;
+  description: string;
+  amount: number;
+  paidBy: Array<{
+    userId: string;
+    amountPaid: number;
+  }>;
+}): Promise<CreateExpenseResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to create an expense',
+      };
+    }
+
+    const response = await fetch(`${URL}/expenses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      body: JSON.stringify(expenseData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to create expense',
+      };
+    }
+
+    // Revalidate the groups page to refresh the data
+    revalidatePath('/dashboard/groups');
+    revalidatePath(`/dashboard/groups/${expenseData.groupId}`);
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    console.error('Error creating expense:', error);
+    return {
+      success: false,
+      error: 'Failed to create expense. Please try again later.',
+    };
+  }
+}
+
+export type DashboardOverviewResult = {
+  success: boolean;
+  data?: {
+    totalGroups: number;
+    totalMembers: number;
+    totalAmount: number;
+    userBalance: number;
+    recentExpenses: Array<{
+      _id: string;
+      name: string;
+      description: string;
+      amount: number;
+      date: string;
+      groupId: {
+        _id: string;
+        name: string;
+      };
+      paidBy: Array<{
+        userId: string;
+        amountPaid: number;
+        paidAt: string;
+      }>;
+    }>;
+    pendingInvitations: Array<{
+      _id: string;
+      name: string;
+      creator: {
+        _id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+      };
+    }>;
+  };
+  error?: string;
+};
+
+export async function getDashboardOverview(): Promise<DashboardOverviewResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to view dashboard',
+      };
+    }
+
+    const response = await fetch(`${URL}/overview`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+    console.log(response);
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to fetch dashboard data',
+      };
+    }
+
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch dashboard data. Please try again later.',
+    };
+  }
+}
+
+export type GetUserExpensesResult = {
+  success: boolean;
+  data?: {
+    expenses: Array<{
+      id: string;
+      name: string;
+      description: string;
+      amount: number;
+      date: string;
+      groupId: {
+        id: string;
+        name: string;
+      };
+      paidBy: Array<{
+        userId: string;
+        amountPaid: number;
+        paidAt: string;
+      }>;
+      status: 'pending' | 'settled';
+    }>;
+  };
+  error?: string;
+};
+
+export async function getUserExpenses(): Promise<GetUserExpensesResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to view expenses',
+      };
+    }
+
+    // Use the improved backend endpoint to get all expenses across all groups
+    const response = await fetch(`${URL}/balance`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: 'Failed to fetch expenses',
+      };
+    }
+
+    const result = await response.json();
+
+    // Ensure the expenses have the correct format
+    const formattedExpenses = Array.isArray(result)
+      ? result.map((expense) => ({
+          id: expense._id || expense.id,
+          name: expense.name,
+          description: expense.description,
+          amount: expense.amount,
+          date: expense.date,
+          groupId: {
+            id: expense.groupId._id || expense.groupId.id,
+            name: expense.groupId.name,
+          },
+          paidBy: expense.paidBy,
+          status: expense.status || 'pending',
+        }))
+      : [];
+
+    return {
+      success: true,
+      data: {
+        expenses: formattedExpenses,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching expenses:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch expenses. Please try again later.',
+    };
+  }
+}
+
+export async function sendPaymentReminder(
+  expenseId: string,
+  debtorId: string,
+): Promise<ApiResult<void>> {
+  try {
+    const session = await getServerSession(authOptions);
+    const response = await fetch(`${URL}/expenses/${expenseId}/remind`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session?.accessToken}`,
+      },
+      body: JSON.stringify({ debtorId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to send reminder');
+    }
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error('Error sending reminder:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send reminder',
     };
   }
 }

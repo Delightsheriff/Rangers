@@ -120,7 +120,7 @@ exports.getGroup = async (req, res, next) => {
     const { groupId } = req.params;
     const userId = req.user._id;
 
-    const group = await GroupModel.findById(groupId).populate('expenseId');
+    const group = await GroupModel.findById(groupId);
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -140,6 +140,27 @@ exports.getGroup = async (req, res, next) => {
     // Populate creator and member information
     await group.populate('creator', 'firstName lastName email');
     await group.populate('members.user', 'firstName lastName email');
+
+    // Populate expenses
+    await group.populate('expenses');
+
+    // Calculate total amount spent
+    const totalAmount = group.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+    // Calculate user's balance
+    const userExpenses = group.expenses.filter((expense) =>
+      expense.paidBy.some((payment) => payment.userId.toString() === userId.toString()),
+    );
+
+    const userPaid = userExpenses.reduce((sum, expense) => {
+      const userPayment = expense.paidBy.find(
+        (payment) => payment.userId.toString() === userId.toString(),
+      );
+      return sum + (userPayment ? userPayment.amountPaid : 0);
+    }, 0);
+
+    const userShare = totalAmount / group.members.length;
+    const userBalance = userPaid - userShare;
 
     res.status(200).json({
       success: true,
@@ -163,6 +184,20 @@ exports.getGroup = async (req, res, next) => {
           email: invite.email,
           invitedAt: invite.invitedAt,
         })),
+        expenses: group.expenses.map((expense) => ({
+          id: expense._id,
+          name: expense.name,
+          description: expense.description,
+          amount: expense.amount,
+          date: expense.date,
+          paidBy: expense.paidBy.map((payment) => ({
+            userId: payment.userId,
+            amountPaid: payment.amountPaid,
+            paidAt: payment.paidAt,
+          })),
+        })),
+        totalAmount,
+        userBalance,
         createdAt: group.createdAt,
         updatedAt: group.updatedAt,
       },
@@ -184,19 +219,46 @@ exports.getUserGroups = async (req, res, next) => {
       'members.isActive': true,
     }).populate('creator', 'firstName lastName email');
 
-    const formattedGroups = groups.map((group) => ({
-      id: group._id,
-      name: group.name,
-      description: group.description,
-      creator: {
-        id: group.creator._id,
-        name: `${group.creator.firstName} ${group.creator.lastName}`,
-        email: group.creator.email,
-      },
-      memberCount: group.members.length,
-      createdAt: group.createdAt,
-      updatedAt: group.updatedAt,
-    }));
+    // Populate expenses for each group
+    for (const group of groups) {
+      await group.populate('expenses');
+    }
+
+    const formattedGroups = groups.map((group) => {
+      // Calculate total amount spent
+      const totalAmount = group.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+      // Calculate user's balance
+      const userExpenses = group.expenses.filter((expense) =>
+        expense.paidBy.some((payment) => payment.userId.toString() === userId.toString()),
+      );
+
+      const userPaid = userExpenses.reduce((sum, expense) => {
+        const userPayment = expense.paidBy.find(
+          (payment) => payment.userId.toString() === userId.toString(),
+        );
+        return sum + (userPayment ? userPayment.amountPaid : 0);
+      }, 0);
+
+      const userShare = totalAmount / group.members.length;
+      const userBalance = userPaid - userShare;
+
+      return {
+        id: group._id,
+        name: group.name,
+        description: group.description,
+        creator: {
+          id: group.creator._id,
+          name: `${group.creator.firstName} ${group.creator.lastName}`,
+          email: group.creator.email,
+        },
+        memberCount: group.members.length,
+        totalAmount,
+        userBalance,
+        createdAt: group.createdAt,
+        updatedAt: group.updatedAt,
+      };
+    });
 
     res.status(200).json({
       success: true,

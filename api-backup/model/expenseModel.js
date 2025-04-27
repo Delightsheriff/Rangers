@@ -42,10 +42,23 @@ const ExpenseSchema = new mongoose.Schema(
         },
       },
     ],
+    splits: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        amount: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const ExpenseModel = mongoose.model('Expense', ExpenseSchema);
