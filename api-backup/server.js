@@ -4,6 +4,7 @@ const connectDb = require('./db/dbController');
 const userRouter = require('./router/userRouter');
 const groupRouter = require('./router/groupRouter');
 const expenseRouter = require('./router/expenseRouter');
+const dashboardRouter = require('./router/dashboardRouter');
 const app = express();
 const err = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
@@ -20,7 +21,7 @@ const port = process.env.PORT || 5000;
 // Connect to database
 connectDb()
   .then(() => {
-    // Start server only after successful database connection 
+    // Start server only after successful database connection
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
     });
@@ -57,6 +58,7 @@ app.get('/', (req, res) => {
 app.use('/api', userRouter);
 app.use('/api', groupRouter);
 app.use('/api', expenseRouter);
+app.use('/api', dashboardRouter);
 
 // Error handling middleware
 app.use(err);

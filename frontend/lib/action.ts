@@ -449,3 +449,82 @@ export async function createExpense(expenseData: {
     };
   }
 }
+
+export type DashboardOverviewResult = {
+  success: boolean;
+  data?: {
+    totalGroups: number;
+    totalMembers: number;
+    totalAmount: number;
+    userBalance: number;
+    recentExpenses: Array<{
+      _id: string;
+      name: string;
+      description: string;
+      amount: number;
+      date: string;
+      groupId: {
+        _id: string;
+        name: string;
+      };
+      paidBy: Array<{
+        userId: string;
+        amountPaid: number;
+        paidAt: string;
+      }>;
+    }>;
+    pendingInvitations: Array<{
+      _id: string;
+      name: string;
+      creator: {
+        _id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+      };
+    }>;
+  };
+  error?: string;
+};
+
+export async function getDashboardOverview(): Promise<DashboardOverviewResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to view dashboard',
+      };
+    }
+
+    const response = await fetch(`${URL}/overview`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+    console.log(response);
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.message || result.error || 'Failed to fetch dashboard data',
+      };
+    }
+
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch dashboard data. Please try again later.',
+    };
+  }
+}
