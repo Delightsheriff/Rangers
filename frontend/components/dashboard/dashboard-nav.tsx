@@ -3,15 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import {
-  LayoutDashboard,
-  Users,
-  Receipt,
-  CreditCard,
-  FileText,
-  Settings,
-  Wallet,
-} from 'lucide-react';
+import { LayoutDashboard, Users, Receipt, CreditCard } from 'lucide-react';
 
 export default function DashboardNav() {
   const pathname = usePathname();
@@ -40,24 +32,6 @@ export default function DashboardNav() {
       href: '/dashboard/settlements',
       icon: CreditCard,
       id: 'settlements',
-    },
-    {
-      name: 'Reports',
-      href: '/dashboard/reports',
-      icon: FileText,
-      id: 'reports',
-    },
-    {
-      name: 'Wallet',
-      href: '/dashboard/wallet',
-      icon: Wallet,
-      id: 'wallet',
-    },
-    {
-      name: 'Settings',
-      href: '/dashboard/settings',
-      icon: Settings,
-      id: 'settings',
     },
   ];
 

@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import AddExpenseButton from '@/components/dashboard/expenses/add-expense-button';
 
 export default function GroupPage() {
   const params = useParams();
@@ -161,7 +162,11 @@ export default function GroupPage() {
                   <Edit className="h-4 w-4" />
                   Edit Group
                 </Button>
-                <Button>Add Expense</Button>
+                <AddExpenseButton
+                  onSuccess={() => {
+                    toast.success('Expense added successfully');
+                  }}
+                />
               </div>
             </div>
             <p className="mt-1 text-muted-foreground">{group.description}</p>

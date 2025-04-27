@@ -12,7 +12,6 @@ import {
   ArrowRight,
   CheckCircle,
   Clock,
-  Download,
   Filter,
   Search,
   FileText,
@@ -197,9 +196,8 @@ export default function SettlementsPage() {
 
   const handleRecordPayment = () => {
     if (!selectedPerson || !paymentMethod || !paymentAmount) {
-      toast(
-         'Missing information',{
-          description: 'Please fill in all fields to record a payment.'
+      toast('Missing information', {
+        description: 'Please fill in all fields to record a payment.',
       });
       return;
     }
@@ -224,10 +222,6 @@ export default function SettlementsPage() {
     toast(`Reminder sent to person with ID: ${personId}`);
   };
 
-  const handleExportTransactions = () => {
-    toast('Transactions exported');
-  };
-
   return (
     <div>
       <main className="flex-1 p-6">
@@ -237,9 +231,6 @@ export default function SettlementsPage() {
             <p className="text-muted-foreground">Manage payments and track settlements</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={handleExportTransactions}>
-              <Download className="h-4 w-4" />
-            </Button>
             <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
               <DialogTrigger asChild>
                 <Button className="gap-2">
