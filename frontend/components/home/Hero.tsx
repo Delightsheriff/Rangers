@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import HeroIllustration from './HeroIllustration';
 
 function Hero() {
+
+  
   return (
     <section className="container  px-6 grid items-center gap-6 py-12 md:grid-cols-2 md:py-24">
       <div className="flex flex-col gap-4">

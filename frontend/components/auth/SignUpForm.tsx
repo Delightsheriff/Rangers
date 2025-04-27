@@ -44,7 +44,7 @@ export default function SignUpForm() {
 
       if (result.success) {
         toast.success('Sign up successful!');
-        router.push('/auth/login');
+        router.push('/login');
       } else {
         toast.error(result.error || 'Sign up failed. Please try again.');
       }

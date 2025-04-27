@@ -9,7 +9,7 @@ export default function HowItWorks() {
           </p>
         </div>
         <div className="grid gap-8 md:grid-cols-3">
-          <div className="rounded-lg border bg-card p-6 text-card-foreground shadow">
+          <div className="rounded-lg border bg-card p-6 text-card-foreground shadow scale ">
             <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,7 @@ export default function HowItWorks() {
               or username.
             </p>
           </div>
-          <div className="rounded-lg border bg-card p-6 text-card-foreground shadow">
+          <div className="rounded-lg border bg-card p-6 text-card-foreground shadow scale">
             <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +58,7 @@ export default function HowItWorks() {
               expenses.
             </p>
           </div>
-          <div className="rounded-lg border bg-card p-6 text-card-foreground shadow">
+          <div className="rounded-lg border bg-card p-6 text-card-foreground shadow scale">
             <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

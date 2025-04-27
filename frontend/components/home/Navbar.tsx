@@ -2,6 +2,7 @@ import React from 'react';
 import { CircleDollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { ModeToggle } from '@/components/home/ModeToggle';
 
 function Navbar() {
   return (
@@ -14,11 +15,12 @@ function Navbar() {
       </div>
       <nav className="flex items-center gap-2 md:gap-6">
         <Button asChild variant="default">
-          <Link href="/auth/signup">Sign Up</Link>
+          <Link href="/signup">Sign Up</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/auth/login">Log In</Link>
+          <Link href="/login">Log In</Link>
         </Button>
+        <ModeToggle />
       </nav>
     </header>
   );

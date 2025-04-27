@@ -8,7 +8,17 @@ import { ArrowLeft, UserPlus, Edit, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { getGroupDetails, GroupDetails } from '@/lib/action';
+import { getGroupDetails, GroupDetails, addMemberToGroup } from '@/lib/action';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function GroupPage() {
   const params = useParams();
@@ -18,6 +28,9 @@ export default function GroupPage() {
   const [group, setGroup] = useState<GroupDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isInviteLoading, setIsInviteLoading] = useState(false);
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
@@ -46,6 +59,45 @@ export default function GroupPage() {
       fetchGroupDetails();
     }
   }, [groupId]);
+
+  const openInviteModal = () => {
+    setIsInviteModalOpen(true);
+    setInviteEmail('');
+  };
+
+  const closeInviteModal = () => {
+    setIsInviteModalOpen(false);
+    setInviteEmail('');
+    setIsInviteLoading(false);
+  };
+
+  const submitInvite = async () => {
+    if (!inviteEmail) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    setIsInviteLoading(true);
+    try {
+      const result = await addMemberToGroup(groupId, inviteEmail);
+      if (result.success) {
+        toast.success(result.message || `Invitation sent to ${inviteEmail}`);
+        // Refresh the group details
+        const updatedResult = await getGroupDetails(groupId);
+        if (updatedResult.success && updatedResult.data) {
+          setGroup(updatedResult.data.group);
+        }
+        closeInviteModal();
+      } else {
+        toast.error(result.error || 'Failed to send invitation');
+      }
+    } catch (err) {
+      console.error('Error sending invitation:', err);
+      toast.error('An error occurred while sending the invitation');
+    } finally {
+      setIsInviteLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -142,9 +194,7 @@ export default function GroupPage() {
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-1 rounded-full"
-                onClick={() => {
-                  toast('This feature is coming soon.');
-                }}
+                onClick={openInviteModal}
               >
                 <UserPlus className="h-4 w-4" />
                 Invite
@@ -187,6 +237,42 @@ export default function GroupPage() {
           </div>
         </main>
       </div>
+
+      {/* Invite Member Modal */}
+      <Dialog
+        open={isInviteModalOpen}
+        onOpenChange={(open) => {
+          if (!open) closeInviteModal();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invite Member</DialogTitle>
+            <DialogDescription>Enter the email of the person to invite.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="example@email.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                disabled={isInviteLoading}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeInviteModal} disabled={isInviteLoading}>
+              Cancel
+            </Button>
+            <Button onClick={submitInvite} disabled={isInviteLoading}>
+              {isInviteLoading ? 'Sending...' : 'Send Invitation'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

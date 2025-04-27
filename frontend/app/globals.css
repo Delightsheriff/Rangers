@@ -120,14 +120,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+html {
+  scroll-behavior: smooth;
+}
+
 .bouncing {
   display: block; /* Necessary for animation */
   animation: bounce 1s infinite alternate; /* Bounce animation */
 }
 
-html {
-  scroll-behavior: smooth;
-}
 
 @keyframes bounce {
   0%,
@@ -140,4 +143,13 @@ html {
   60% {
     transform: translateY(-10px); /* Bounce height */
   }
+}
+
+.scale{
+    transition: transform 0.3s ease ;
+
+
+}
+.scale:hover{
+   transform: scale(1.05);
 }
