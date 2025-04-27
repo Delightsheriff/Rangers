@@ -1,104 +1,104 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+// import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface CurrentActivitiesProps {
-  limit?: number;
-}
+// interface CurrentActivitiesProps {
+//   limit?: number;
+// }
 
-export default function CurrentActivities({ limit = 10 }: CurrentActivitiesProps) {
+export default function CurrentActivities() {
   // This would come from an API in a real app
-  const activities = [
-    {
-      id: 1,
-      user: {
-        name: 'Taylor Smith',
-        avatar: '/placeholder.svg?height=40&width=40',
-        initials: 'TS',
-      },
-      action: 'added',
-      expense: {
-        name: 'Dinner at Seafood Palace',
-        amount: 145.75,
-        date: 'Just now',
-        group: 'Cancun Trip 2025',
-      },
-    },
-    {
-      id: 2,
-      user: {
-        name: 'Morgan Chen',
-        avatar: '/placeholder.svg?height=40&width=40',
-        initials: 'MC',
-      },
-      action: 'added',
-      expense: {
-        name: 'Airport Taxi',
-        amount: 58.5,
-        date: '2 hours ago',
-        group: 'Cancun Trip 2025',
-      },
-    },
-    {
-      id: 3,
-      user: {
-        name: 'Jordan Lee',
-        avatar: '/placeholder.svg?height=40&width=40',
-        initials: 'JL',
-      },
-      action: 'settled',
-      expense: {
-        name: 'Electricity Bill',
-        amount: 120.0,
-        date: 'Yesterday',
-        group: 'Apartment 304',
-      },
-    },
-    {
-      id: 4,
-      user: {
-        name: 'Riley Davis',
-        avatar: '/placeholder.svg?height=40&width=40',
-        initials: 'RD',
-      },
-      action: 'added',
-      expense: {
-        name: 'Groceries',
-        amount: 85.2,
-        date: '2 days ago',
-        group: 'Apartment 304',
-      },
-    },
-    {
-      id: 5,
-      user: {
-        name: 'Alex Johnson',
-        avatar: '/placeholder.svg?height=40&width=40',
-        initials: 'AJ',
-      },
-      action: 'added',
-      expense: {
-        name: 'Movie Tickets',
-        amount: 48.0,
-        date: '3 days ago',
-        group: 'Dinner Club',
-      },
-    },
-    {
-      id: 6,
-      user: {
-        name: 'Taylor Smith',
-        avatar: '/placeholder.svg?height=40&width=40',
-        initials: 'TS',
-      },
-      action: 'settled',
-      expense: {
-        name: 'Lunch',
-        amount: 32.5,
-        date: '4 days ago',
-        group: 'Office Lunch Group',
-      },
-    },
-  ].slice(0, limit);
+  // const activities = [
+  //   {
+  //     id: 1,
+  //     user: {
+  //       name: 'Taylor Smith',
+  //       avatar: '/placeholder.svg?height=40&width=40',
+  //       initials: 'TS',
+  //     },
+  //     action: 'added',
+  //     expense: {
+  //       name: 'Dinner at Seafood Palace',
+  //       amount: 145.75,
+  //       date: 'Just now',
+  //       group: 'Cancun Trip 2025',
+  //     },
+  //   },
+  //   {
+  //     id: 2,
+  //     user: {
+  //       name: 'Morgan Chen',
+  //       avatar: '/placeholder.svg?height=40&width=40',
+  //       initials: 'MC',
+  //     },
+  //     action: 'added',
+  //     expense: {
+  //       name: 'Airport Taxi',
+  //       amount: 58.5,
+  //       date: '2 hours ago',
+  //       group: 'Cancun Trip 2025',
+  //     },
+  //   },
+  //   {
+  //     id: 3,
+  //     user: {
+  //       name: 'Jordan Lee',
+  //       avatar: '/placeholder.svg?height=40&width=40',
+  //       initials: 'JL',
+  //     },
+  //     action: 'settled',
+  //     expense: {
+  //       name: 'Electricity Bill',
+  //       amount: 120.0,
+  //       date: 'Yesterday',
+  //       group: 'Apartment 304',
+  //     },
+  //   },
+  //   {
+  //     id: 4,
+  //     user: {
+  //       name: 'Riley Davis',
+  //       avatar: '/placeholder.svg?height=40&width=40',
+  //       initials: 'RD',
+  //     },
+  //     action: 'added',
+  //     expense: {
+  //       name: 'Groceries',
+  //       amount: 85.2,
+  //       date: '2 days ago',
+  //       group: 'Apartment 304',
+  //     },
+  //   },
+  //   {
+  //     id: 5,
+  //     user: {
+  //       name: 'Alex Johnson',
+  //       avatar: '/placeholder.svg?height=40&width=40',
+  //       initials: 'AJ',
+  //     },
+  //     action: 'added',
+  //     expense: {
+  //       name: 'Movie Tickets',
+  //       amount: 48.0,
+  //       date: '3 days ago',
+  //       group: 'Dinner Club',
+  //     },
+  //   },
+  //   {
+  //     id: 6,
+  //     user: {
+  //       name: 'Taylor Smith',
+  //       avatar: '/placeholder.svg?height=40&width=40',
+  //       initials: 'TS',
+  //     },
+  //     action: 'settled',
+  //     expense: {
+  //       name: 'Lunch',
+  //       amount: 32.5,
+  //       date: '4 days ago',
+  //       group: 'Office Lunch Group',
+  //     },
+  //   },
+  // ].slice(0, limit);
 
   return (
     <Card>
@@ -106,7 +106,8 @@ export default function CurrentActivities({ limit = 10 }: CurrentActivitiesProps
         <CardTitle>Recent Activities</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <p>No activities yet</p>
+        {/* <div className="space-y-4">
           {activities.map((activity) => (
             <div key={activity.id} className="flex items-center gap-4">
               <Avatar className="h-9 w-9">
@@ -133,7 +134,7 @@ export default function CurrentActivities({ limit = 10 }: CurrentActivitiesProps
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

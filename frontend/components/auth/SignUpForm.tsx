@@ -44,7 +44,7 @@ export default function SignUpForm() {
 
       if (result.success) {
         toast.success('Sign up successful!');
-        router.push('/auth/login');
+        router.push('/login');
       } else {
         toast.error(result.error || 'Sign up failed. Please try again.');
       }
@@ -63,7 +63,7 @@ export default function SignUpForm() {
   return (
     <div className="w-full">
       <Card>
-        <Form {...form} >
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <CardContent className="pt-4">
               <div className="grid gap-4">

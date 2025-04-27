@@ -11,8 +11,10 @@ import CurrentActivities from '@/components/dashboard/current-activities';
 import MyGroups from '@/app/dashboard/groups/page';
 import { EmptyGroups } from '@/components/dashboard/groups/empty-groups';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('overview');
   const [groups, setGroups] = useState([]); // Assuming you fetch groups data here
 
@@ -21,7 +23,7 @@ export default function DashboardPage() {
       <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, Alex</p>
+          <p className="text-muted-foreground">Welcome back, {session?.user?.firstName}</p>
         </div>
       </div>
 
@@ -90,13 +92,13 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </div>
-          <CurrentActivities limit={5} />
+          <CurrentActivities />
         </TabsContent>
         <TabsContent value="groups" className="space-y-4">
           {groups.length > 0 ? <MyGroups /> : <EmptyGroups />}
         </TabsContent>
         <TabsContent value="activities" className="space-y-4">
-          <CurrentActivities limit={20} />
+          <CurrentActivities />
         </TabsContent>
       </Tabs>
     </main>
