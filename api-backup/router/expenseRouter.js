@@ -8,6 +8,7 @@ const {
   updateExpense,
   deleteExpense,
   getUserExpenses,
+  paidExpense,
 } = require('../controller/expenseController');
 
 // Create a new router instance
@@ -26,6 +27,9 @@ const expenseRouter = Router()
 
   // Route to update an expense
   .put('/expenses/:expenseId', authMiddleware, validateRequest(schemas.updateExpense), updateExpense)
+
+  // Route to pay an expense
+  .put('/expenses/:expenseId/paid', authMiddleware, validateRequest(schemas.updateExpense), paidExpense)
 
   // Route to delete an expense
   .delete('/expenses/:expenseId', authMiddleware, deleteExpense);

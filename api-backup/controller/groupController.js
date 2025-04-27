@@ -120,7 +120,7 @@ exports.getGroup = async (req, res, next) => {
     const { groupId } = req.params;
     const userId = req.user._id;
 
-    const group = await GroupModel.findById(groupId);
+    const group = await GroupModel.findById(groupId).populate('expenseId');
     if (!group) {
       return res.status(404).json({
         success: false,
