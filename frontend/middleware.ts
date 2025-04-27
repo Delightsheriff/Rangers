@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
 
     // If it's a dashboard route and there's no token, redirect to sign in
     if (isDashboardRoute && !token) {
-      const signInUrl = new URL('/auth/login', request.url);
+      const signInUrl = new URL('/login', request.url);
       // Add the original URL as a callback parameter
       signInUrl.searchParams.set('callbackUrl', encodeURI(request.url));
       return NextResponse.redirect(signInUrl);
@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
 
     if (token?.error) {
       // If the token has an error, redirect to sign in
-      const signInUrl = new URL('/auth/login', request.url);
+      const signInUrl = new URL('/login', request.url);
       // Add the original URL as a callback parameter
       signInUrl.searchParams.set('callbackUrl', encodeURI(request.url));
       return NextResponse.redirect(signInUrl);
@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   } catch (error) {
     console.error('Middleware error:', error);
-    return NextResponse.redirect(new URL('/auth/error', request.url));
+    return NextResponse.redirect(new URL('/error', request.url));
   }
 }
 

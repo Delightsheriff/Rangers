@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { User, Search, ChevronDown, LogOut, Menu } from 'lucide-react';
+import { User, ChevronDown, LogOut, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +16,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import MobileNav from '@/components/dashboard/mobile-nav';
-import { NotificationsDropdown } from './dashboard-notifications';
 import { useSession, signOut } from 'next-auth/react';
+import { ModeToggle } from '../home/ModeToggle';
 
 export default function DashboardHeader() {
   const router = useRouter();
@@ -66,15 +65,7 @@ export default function DashboardHeader() {
           <span>SplitWise</span>
         </Link>
         <div className="ml-auto flex items-center gap-4">
-          <form className="relative hidden md:block">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="w-64 rounded-full bg-muted pl-8 md:w-80"
-            />
-          </form>
-          <NotificationsDropdown />
+          <ModeToggle />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
