@@ -10,11 +10,21 @@ exports.createExpense = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
+    // Get group
+    const group = await GroupModel.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+    
+    const amountToBePaid = amount / group.members.length;
+
+
     // Create new expense
     const newExpense = await ExpenseModel.create({
       groupId,
       description,
-      amount,
+      amount: amountToBePaid,
+      amountPaid: amount,
       paidBy,
       paidAt,
     });
@@ -99,6 +109,34 @@ exports.getUserExpenses = async (req, res) => {
     const { userId } = req.params;
     const expenses = await ExpenseModel.find({ 'paidBy.userId': userId });
     res.status(200).json(expenses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// Paid an expense
+exports.paidExpense = async (req, res) => {
+  try {
+    const { expenseId } = req.params;
+    const { userId, amountPaid } = req.body;
+
+    // Validate input
+    if (!userId || !amountPaid) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Update expense
+    const updatedExpense = await ExpenseModel.findByIdAndUpdate(
+      expenseId,
+      { $push: { paidBy: { userId, amountPaid } } },
+      { new: true }
+    );
+
+    if (!updatedExpense) {
+      return res.status(404).json({ message: 'Expense not found' });
+    }
+
+    res.status(200).json(updatedExpense);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -13,13 +13,14 @@ const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const YAML = require('yamljs');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
 // Connect to database
 connectDb()
   .then(() => {
-    // Start server only after successful database connection
+    // Start server only after successful database connection 
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
     });
@@ -47,8 +48,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
 // Landing page for the api
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -62,9 +61,7 @@ app.use('/api', expenseRouter);
 // Error handling middleware
 app.use(err);
 
-const swaggerSpec = generateSwaggerSpec(app, {
-  title: 'SplitWise API',
-  description: 'Auto-generated API docs',
-});
+// Load the YAML file
+const swaggerDocument = YAML.load('./swagger-docs.yml');
 
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
