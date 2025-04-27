@@ -4,6 +4,8 @@ import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { authOptions } from './auth';
 import { Group, GroupDetails } from '@/interface/group';
+import { ApiResult } from '@/types/api';
+// import { getSessionToken } from '@/lib/auth';
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -525,6 +527,122 @@ export async function getDashboardOverview(): Promise<DashboardOverviewResult> {
     return {
       success: false,
       error: 'Failed to fetch dashboard data. Please try again later.',
+    };
+  }
+}
+
+export type GetUserExpensesResult = {
+  success: boolean;
+  data?: {
+    expenses: Array<{
+      id: string;
+      name: string;
+      description: string;
+      amount: number;
+      date: string;
+      groupId: {
+        id: string;
+        name: string;
+      };
+      paidBy: Array<{
+        userId: string;
+        amountPaid: number;
+        paidAt: string;
+      }>;
+      status: 'pending' | 'settled';
+    }>;
+  };
+  error?: string;
+};
+
+export async function getUserExpenses(): Promise<GetUserExpensesResult> {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.accessToken) {
+      return {
+        success: false,
+        error: 'You must be logged in to view expenses',
+      };
+    }
+
+    // Use the improved backend endpoint to get all expenses across all groups
+    const response = await fetch(`${URL}/balance`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: 'Failed to fetch expenses',
+      };
+    }
+
+    const result = await response.json();
+
+    // Ensure the expenses have the correct format
+    const formattedExpenses = Array.isArray(result)
+      ? result.map((expense) => ({
+          id: expense._id || expense.id,
+          name: expense.name,
+          description: expense.description,
+          amount: expense.amount,
+          date: expense.date,
+          groupId: {
+            id: expense.groupId._id || expense.groupId.id,
+            name: expense.groupId.name,
+          },
+          paidBy: expense.paidBy,
+          status: expense.status || 'pending',
+        }))
+      : [];
+
+    return {
+      success: true,
+      data: {
+        expenses: formattedExpenses,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching expenses:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch expenses. Please try again later.',
+    };
+  }
+}
+
+export async function sendPaymentReminder(
+  expenseId: string,
+  debtorId: string,
+): Promise<ApiResult<void>> {
+  try {
+    const session = await getServerSession(authOptions);
+    const response = await fetch(`${URL}/expenses/${expenseId}/remind`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session?.accessToken}`,
+      },
+      body: JSON.stringify({ debtorId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to send reminder');
+    }
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error('Error sending reminder:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send reminder',
     };
   }
 }

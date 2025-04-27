@@ -102,7 +102,15 @@ const schemas = {
           amountPaid: z.number().positive('Amount paid must be a positive number'),
         }),
       )
-      .min(1, 'At least one payment is required'),
+      .min(1, 'At least one payer is required'),
+    splits: z
+      .array(
+        z.object({
+          userId: z.string().min(1, 'User ID is required'),
+          amount: z.number().positive('Amount must be a positive number'),
+        }),
+      )
+      .min(1, 'At least one split is required'),
   }),
 
   // Update expense schema
@@ -126,11 +134,11 @@ const schemas = {
 
   // Paid expense schema
   paidExpense: z.array(
-      z.object({
-        userId: z.string().min(1, 'User ID is required'),
-        amountPaid: z.number().positive('Amount paid must be a positive number'),
-      }),
-    ),
+    z.object({
+      userId: z.string().min(1, 'User ID is required'),
+      amountPaid: z.number().positive('Amount paid must be a positive number'),
+    }),
+  ),
 };
 
 module.exports = {

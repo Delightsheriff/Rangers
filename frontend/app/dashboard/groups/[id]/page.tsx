@@ -21,8 +21,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AddExpenseButton from '@/components/dashboard/expenses/add-expense-button';
 import { cn } from '@/lib/utils';
+import { AddExpenseButton } from '@/components/dashboard/expenses/add-expense-button';
 
 export default function GroupPage() {
   const params = useParams();
